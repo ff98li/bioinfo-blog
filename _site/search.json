@@ -1,0 +1,20 @@
+{
+  "articles": [
+    {
+      "path": "about.html",
+      "title": "About",
+      "description": "My learning journal of bioinformatics.",
+      "author": [],
+      "contents": "\r\nFeifei Li\r\n<ff.li@mail.utoronto.ca>\r\n4th year student of Bioinformatics and Computational Biology specialist,\r\nMajoring in Statistics\r\nThis blog is dedicated to documenting my learning path of bioinformatics.\r\nIt is still under construction.\r\n\r\n\r\n\r\n",
+      "last_modified": "2021-05-03T00:03:21-04:00"
+    },
+    {
+      "path": "index.html",
+      "title": "Feifei's blog",
+      "author": [],
+      "contents": "\r\n\r\n\r\n\r\n",
+      "last_modified": "2021-05-03T00:03:21-04:00"
+    }
+  ],
+  "collections": ["posts/posts.json"]
+}

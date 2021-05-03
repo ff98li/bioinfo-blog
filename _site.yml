@@ -1,0 +1,23 @@
+name: "blog"
+title: "Feifei's blog"
+description: |
+    Feifei's blog
+output_dir: "_site"
+navbar:
+    right:
+        - text: "Home"
+          href: index.html
+        - text: "About"
+          href: about.html
+        - icon: fa fa-github
+          href: https://github.com/ff98li
+        - icon: fas fa-graduation-cap
+        - icon: fas fa-lightbulb
+output:
+    distill::distill_article:
+        self_contained: false
+        theme: theme.css
+        highlight: rstudio
+        includes:
+            after_body: "_after_body.html"
+creative_commons: CC BY

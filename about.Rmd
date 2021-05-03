@@ -1,0 +1,19 @@
+---
+title: "About"
+description: |
+  My learning journal of bioinformatics.
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+Feifei Li \
+\<ff.li@mail.utoronto.ca\> \
+4th year student of Bioinformatics and Computational Biology specialist, \
+Majoring in Statistics \
+
+
+This blog is dedicated to documenting my learning path of bioinformatics. \
+
+It is still under construction.
