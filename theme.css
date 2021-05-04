@@ -118,11 +118,13 @@ Retrieved from https://jmbuhr.de/posts/2021-03-14-making-a-darkmode-for-your-dis
 .darkmode .distill-site-header {
   --text-color: var(--darkmode-contrast);
   --bkgd-color: var(--darkmode-bg);
+  --hover-color: var(--darkmode-contrast);
 }
 
 .darkmode .distill-site-footer {
-  --text-color: var(--darkmode-text);
-  --bkgd-color: var(--darkmode-bg);
+  --text-color:  var(--darkmode-text);
+  --bkgd-color:  var(--darkmode-bg);
+  --hover-color: var(--darkmode-contrast);
 }
 
 .darkmode .posts-list .dt-tags .dt-tag,

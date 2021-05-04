@@ -1,16 +1,14 @@
 ---
-title: "A"
+title: "Setting up my distill blog"
 description: |
-  My learning journal of bioinformatics.
+    Starting my learning journal of bioinformatics.
 author:
-  - name: Feifei Li 
-    url:
-    affiliation:
-    affiliation_url:
-date: 05-02-2021
+    - name: Feifei Li
+date: 05-03-2021
 output:
-  distill::distill_article:
-    self_contained: false
+    distill::distill_article:
+        self_contained: FALSE
+        toc: TRUE
 ---
 
 ```{r setup, include=FALSE}

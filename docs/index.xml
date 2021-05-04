@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/" version="2.0">
+  <channel>
+    <title>Feifei's blog</title>
+    <link>https://ff98li.github.io/bioinfo-blog/</link>
+    <atom:link href="https://ff98li.github.io/bioinfo-blog/index.xml" rel="self" type="application/rss+xml"/>
+    <description>Feifei's blog
+</description>
+    <generator>Distill</generator>
+    <lastBuildDate>Mon, 03 May 2021 00:00:00 +0000</lastBuildDate>
+    <item>
+      <title>Setting up my distill blog</title>
+      <dc:creator>Feifei Li</dc:creator>
+      <link>https://ff98li.github.io/bioinfo-blog/posts/2021-05-03-setting-up-my-distill-blog</link>
+      <description>Starting my learning journal of bioinformatics.</description>
+      <guid>https://ff98li.github.io/bioinfo-blog/posts/2021-05-03-setting-up-my-distill-blog</guid>
+      <pubDate>Mon, 03 May 2021 00:00:00 +0000</pubDate>
+    </item>
+  </channel>
+</rss>

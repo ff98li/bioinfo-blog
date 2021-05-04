@@ -1,19 +1,19 @@
 [
   {
-    "path": "posts/welcome/",
-    "title": "A",
-    "description": "My learning journal of bioinformatics.",
+    "path": "posts/2021-05-03-setting-up-my-distill-blog/",
+    "title": "Setting up my distill blog",
+    "description": "Starting my learning journal of bioinformatics.",
     "author": [
       {
         "name": "Feifei Li",
         "url": {}
       }
     ],
-    "date": "2021-05-02",
+    "date": "2021-05-03",
     "categories": [],
     "contents": "\r\nI mainly put my works from past courses here. The goal is to record my learning path of bioinformatics. It is still under construction.\r\n\r\n\r\n\r\n",
     "preview": {},
-    "last_modified": "2021-05-03T00:34:22-04:00",
+    "last_modified": "2021-05-03T23:39:03-04:00",
     "input_file": {}
   }
 ]
