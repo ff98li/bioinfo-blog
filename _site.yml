@@ -1,7 +1,7 @@
-name: "blog"
-title: "Feifei's blog"
+name: "bioinfo-blog"
+title: "Feifei Li"
 description: |
-    Feifei's blog
+    Bioinformatics, R, and more
 output_dir: "docs"
 navbar:
     right:
@@ -9,7 +9,7 @@ navbar:
           href: index.html
         - text: "About"
           href: about.html
-        - icon: fa fa-github
+        - icon: fab fa-github-alt
           href: https://github.com/ff98li
         - icon: fas fa-graduation-cap
         - icon: fas fa-lightbulb

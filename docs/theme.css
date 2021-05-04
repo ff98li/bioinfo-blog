@@ -88,6 +88,7 @@ Retrieved from https://jmbuhr.de/posts/2021-03-14-making-a-darkmode-for-your-dis
   --body-color:      var(--darkmode-text);
   --aside-color:     var(--darkmode-text);
   --fig-cap-color:   var(--darkmode-text);
+  --hover-color:     var(--darkmode-contrast);
   background-color:  var(--darkmode-bg);
   color: var(--darkmode-text);
 }
@@ -96,7 +97,7 @@ Retrieved from https://jmbuhr.de/posts/2021-03-14-making-a-darkmode-for-your-dis
 .darkmode d-appendix,
 .darkmode body {
   background-color: var(--darkmode-bg);
-  color: var(--darkmode-text);
+  color:            var(--darkmode-text);
 }
 
 
@@ -116,8 +117,8 @@ Retrieved from https://jmbuhr.de/posts/2021-03-14-making-a-darkmode-for-your-dis
 }
 
 .darkmode .distill-site-header {
-  --text-color: var(--darkmode-contrast);
-  --bkgd-color: var(--darkmode-bg);
+  --text-color:  var(--darkmode-text);
+  --bkgd-color:  var(--darkmode-bg);
   --hover-color: var(--darkmode-contrast);
 }
 

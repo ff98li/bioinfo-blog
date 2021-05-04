@@ -1,5 +1,5 @@
 ---
-title: "Feifei's blog"
+title: "Bioinformatics, R, and more"
 site: distill::distill_website
 listing: posts
 ---
