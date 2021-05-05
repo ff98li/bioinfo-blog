@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 Feifei Li \
 \<ff.li@mail.utoronto.ca\> \
-4th year student of Bioinformatics and Computational Biology specialist, \
+4th year undergraduate student of Bioinformatics and Computational Biology specialist, \
 Majoring in Statistics \
 
 
