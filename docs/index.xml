@@ -7,14 +7,16 @@
     <description>Bioinformatics, R, and more
 </description>
     <generator>Distill</generator>
-    <lastBuildDate>Mon, 03 May 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 04 May 2021 00:00:00 +0000</lastBuildDate>
     <item>
       <title>Setting up my distill blog</title>
       <dc:creator>Feifei Li</dc:creator>
-      <link>https://ff98li.github.io/bioinfo-blog/posts/2021-05-03-setting-up-my-distill-blog</link>
+      <link>https://ff98li.github.io/bioinfo-blog/posts/2021-05-04-setting-up-my-distill-blog</link>
       <description>Starting my learning journal of bioinformatics.</description>
-      <guid>https://ff98li.github.io/bioinfo-blog/posts/2021-05-03-setting-up-my-distill-blog</guid>
-      <pubDate>Mon, 03 May 2021 00:00:00 +0000</pubDate>
+      <category>misc.</category>
+      <guid>https://ff98li.github.io/bioinfo-blog/posts/2021-05-04-setting-up-my-distill-blog</guid>
+      <pubDate>Tue, 04 May 2021 00:00:00 +0000</pubDate>
+      <media:content url="https://ff98li.github.io/bioinfo-blog/posts/2021-05-04-setting-up-my-distill-blog/distill.png" medium="image" type="image/png" width="2521" height="2911"/>
     </item>
   </channel>
 </rss>

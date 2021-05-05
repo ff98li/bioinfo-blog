@@ -2,14 +2,14 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" version="1.0">
   <url>
     <loc>https://ff98li.github.io/bioinfo-blog/about.html</loc>
-    <lastmod>2021-05-03T00:34:22-04:00</lastmod>
+    <lastmod>2021-05-04T21:25:00-04:00</lastmod>
   </url>
   <url>
     <loc>https://ff98li.github.io/bioinfo-blog/</loc>
     <lastmod>2021-05-04T04:07:44-04:00</lastmod>
   </url>
   <url>
-    <loc>https://ff98li.github.io/bioinfo-blog/posts/2021-05-03-setting-up-my-distill-blog/</loc>
-    <lastmod>2021-05-03T23:39:03-04:00</lastmod>
+    <loc>https://ff98li.github.io/bioinfo-blog/posts/2021-05-04-setting-up-my-distill-blog/</loc>
+    <lastmod>2021-05-04T22:21:24-04:00</lastmod>
   </url>
 </urlset>

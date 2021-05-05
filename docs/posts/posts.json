@@ -1,6 +1,6 @@
 [
   {
-    "path": "posts/2021-05-03-setting-up-my-distill-blog/",
+    "path": "posts/2021-05-04-setting-up-my-distill-blog/",
     "title": "Setting up my distill blog",
     "description": "Starting my learning journal of bioinformatics.",
     "author": [
@@ -9,11 +9,15 @@
         "url": {}
       }
     ],
-    "date": "2021-05-03",
-    "categories": [],
-    "contents": "\r\nI mainly put my works from past courses here. The goal is to record my learning path of bioinformatics. It is still under construction.\r\n\r\n\r\n\r\n",
-    "preview": {},
-    "last_modified": "2021-05-03T23:39:03-04:00",
-    "input_file": {}
+    "date": "2021-05-04",
+    "categories": [
+      "misc."
+    ],
+    "contents": "\r\nMaking it the first post of my first blog.\r\nThe minimalist distill theme was taken from The Mockup Blog(Mock 2020) and modified according to my need, and the idea of scripting a darkmode for my distill site is provided generously by Jannik M. Buhr (Buhr 2021).\r\nMy first post is to give credits to people who share their ideas that have helped me in building this distill blog. As a beginner who am new to distill and have very limited experience of front end web programming, I benefited a great deal from these people’s works.\r\nTook me two days to get the site successfully deployed. Looking forward to putting some actual posts.\r\n\r\n\r\n\r\nBuhr, Jannik. 2021. “Jmbuhr.de: Making a Darkmode for Your Distill Site.” https://jmbuhr.de/posts/2021-03-14-making-a-darkmode-for-your-distill-site/.\r\n\r\n\r\nMock, Thomas. 2020. “The Mockup Blog: Building a Blog with Distill.” https://themockup.blog/posts/2020-08-01-building-a-blog-with-distill/.\r\n\r\n\r\n\r\n\r\n",
+    "preview": "posts/2021-05-04-setting-up-my-distill-blog/distill.png",
+    "last_modified": "2021-05-04T22:21:24-04:00",
+    "input_file": {},
+    "preview_width": 2521,
+    "preview_height": 2911
   }
 ]
