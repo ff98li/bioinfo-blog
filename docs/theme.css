@@ -51,6 +51,7 @@ html {
 .d-contents {
   --heading-size:    18px;
   --contents-size:   13px;
+  --hover-color:     #ff6700;
 }
 
 /*-- ARTICLE APPENDIX --*/
@@ -126,6 +127,18 @@ Retrieved from https://jmbuhr.de/posts/2021-03-14-making-a-darkmode-for-your-dis
   --text-color:  var(--darkmode-text);
   --bkgd-color:  var(--darkmode-bg);
   --hover-color: var(--darkmode-contrast);
+}
+
+.darkmode a {
+  border-color: var(--darkmode-text);
+}
+
+.darkmode a:hover {
+  border-color: var(--darkmode-contrast);
+}
+
+.darkmode .categories li > * {
+  color:  var(--darkmode-text);
 }
 
 .darkmode .posts-list .dt-tags .dt-tag,
