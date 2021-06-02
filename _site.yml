@@ -19,7 +19,6 @@ collections:
     share: [twitter, linkedin]
 output:
     distill::distill_article:
-        self_contained: false
         theme: theme.css
         highlight: rstudio
         includes:

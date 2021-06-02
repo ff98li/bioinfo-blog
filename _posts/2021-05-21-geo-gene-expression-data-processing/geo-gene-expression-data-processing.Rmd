@@ -1,0 +1,191 @@
+---
+title: "Setting Up R for Gene Expression Analysis (and for other bioinformatics workflows)"
+description: |
+    A Windows user oriented guide to
+    initial set-up for R, package installation,
+    and getting experiment data from GEO.
+draft: TRUE
+author:
+    - name: Feifei Li
+      url: {}
+date: 05-21-2021
+output:
+    distill::distill_article:
+      self_contained: false
+      toc: TRUE
+categories:
+    - bioinformatics workflow
+    - R
+    - bioconductor
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+I decided to write this because some of the steps in setting up R for
+the new version of Bioconductor could get painful on Windows,
+and they never teach you this in school.
+On UNIX/Linux getting things set up could simply take one or two commands.
+
+## R Setup
+
+To readers who would like to follow the guide to set up R step-by-step,
+I recommend you set up the package directory first
+(see [R Package Directory](#r-pkg-dir)) if you have never done so.
+
+### R Version
+
+We are going to use Bioconductor extensively in this workflow.
+Each version of Bioconductor has different requirements for R version.
+Here I decide to use the latest version of Bioconductor
+(till the date this post is created),
+which requires R version __4.1.0__ or higher.
+
+To check if you have the right version of R installed:
+
+```{r updateR, eval=FALSE}
+## Get the current version of R on your computer
+Rver <- unlist(
+    regmatches(R.version.string,
+               regexec("(\\d+).(\\d+).(\\d+)", R.version.string)
+    )
+)[1]
+## Update R if your R version is below the requirement
+if (Rver <= "4.1.0") {
+    if (!requireNamespace("installr", quietly = TRUE)) {
+        if(!requireNamespace("devtools", quietly = TRUE)) {
+            ## install installr from CRAN if no devtools
+            install.packages("installr")
+        } else {
+            ## use devtools to install the latest installr version from GitHub
+            devtools::install_github('talgalili/installr')
+        }
+    }
+    installr::updateR()
+}
+```
+
+You will be prompted to install the latest version of R
+if the current version of R on your computer does not meet the requirement.
+Once the installation is complete,
+restart RStudio.
+Don't just use the <code>Session > Restart R</code>
+because it won't switch to the latest installed R version in RStudio.
+In the new R session,
+check your package library directory with <code>.libpaths()</code> as
+the newly updated R will change it to the R version specific directory.
+If the User installation was selected during the installation,
+the directory could be <code>C:\User\$env:USERNAME\Documents\R\win-library</code>.
+If the default system installation was selected, it could be
+<code>C:\Program Files\R\R-4.1.0\library</code>.
+Sometimes it ends up in
+<code>X:\{your R directory}\R-4.1.0\library</code>.
+You might want to change it if these are not what you want.
+
+### R Package Directory {#r-pkg-dir}
+
+For me, I have a dedicated directory for R packages.
+This way, I won't need to suffer from re-installing or migrating R packages
+from the previous version of R after an update.
+To change the default R package directory, enter the following in PowerShell:
+
+```
+Add-Content C:\Users\$env:USERNAME\Documents\.Renviron R_LIBS="{path to your package directory}"
+Add-Content C:\Users\$env:USERNAME\Documents\.Renviron R_LIBS_USER="{path to your package directory}\\user"
+Add-Content C:\Users\$env:USERNAME\Documents\.Renviron R_LIBS_SITE="{path to your package directory}\\site"
+```
+
+Don't forget double slashes in the directory path.
+
+If this is your first time setting up a default package library,
+after the update you will have to re-install <code>knitr</code> and <code>rmarkdown</code>
+
+
+### Bioconductor
+
+```{r installBioc, warning=FALSE, echo=FALSE, eval=FALSE}
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install(version = "3.13")
+```
+
+### Packages
+
+```{r install-GEOmetadb, warning=FALSE, echo=FALSE, eval=FALSE}
+if (!requireNamespace("GEOmetadb", quietly = TRUE))
+    BiocManager::install("GEOmetadb", ask = FALSE)
+```
+
+# How to find experiment data on GEO
+
+
+
+```{r create-data-dir, warning=FALSE, echo=FALSE}
+if(!dir.exists("./data")) {
+    dir.create("./data", showWarnings = FALSE)
+}
+```
+
+```{r, warning=FALSE, eval=FALSE}
+# Download GEOmeta database if not found
+if(!file.exists("./data/GEOmetadb.sqlite"))
+    GEOmetadb::getSQLiteFile(destdir = "./data")
+# Establish connection to GEOmetadb.sqlite
+con <- DBI::dbConnect(RSQLite::SQLite(), "./data/GEOmetadb.sqlite")
+```
+
+Building an SQL query to find a list of experiments of interests.
+```{r, warning=FALSE, eval=FALSE}
+query <- paste(
+    "SELECT DISTINCT",
+        "gse.title,",
+        "gse.gse,",
+        "gpl.title AS platform,",
+        "gse.submission_date,",
+        "gse.supplementary_file",
+    "FROM",
+        "gse JOIN gse_gpl ON gse_gpl.gse=gse.gse",
+            "JOIN gpl ON gse_gpl.gpl=gpl.gpl",
+    "WHERE",
+        "gse.submission_date > '2015-01-01' AND",       # not older than 6 years
+        "gse.title LIKE '%SARS-CoV-2%' AND ",                # study about covid
+        "gpl.organism LIKE '%Homo sapiens%' AND",   # human cells or tissue data
+        "gpl.technology LIKE '%high-throughput seq%' ",           # RNA-seq data
+    sep = " ")
+```
+
+Query GEOmeta database:
+```{r, warning=FALSE, eval=FALSE}
+GEOresult <- DBI::dbGetQuery(conn = con, statement = query)
+DBI::dbDisconnect(con); rm(con) # close connection
+# Look for experiments that provide RNA-seq count files
+hasCounts_files <- GEOresult$supplementary_file[
+    grep(
+        GEOresult$supplementary_file,
+        pattern     = "count",
+        ignore.case = TRUE
+        )
+    ]
+
+# Using Regex to extract GEO series of such experiments
+hasCounts_gse <- unlist(
+    regmatches(hasCounts_files,
+               regexec("GSE[0-9]{4,}[^/]", hasCounts_files)
+    )
+)
+
+SELECT_ROWS <- GEOresult$gse %in% hasCounts_gse
+candidate_dataset <- GEOresult[SELECT_ROWS, ]
+candidate_dataset[ , 1:2]
+```
+
+# Dataset to be Used
+
+
+
+This dataset contains RNA-seq count data generated by profiling  peripheral blood from 62 COVID-19 patients (**COVID-19** group) and 24 healthy controls (**HC** group) via bulk RNA-seq. It is publicly available on Gene Expression Omnibus database (GEO) under accession number  [GSE152641](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE152641)[@GSE152641] as a count matrix with 20460 unique Entrez gene ID's along the rows and 86 samples (biological replicates) along the columns.
+The original study not only performed expression analysis on genes of these 86 samples, but also compiled expression data of prior studies on six viruses: influenza, RSV, HRV, Ebola, Dengue, and SARS in an attempt to isolate COVID-19 biomarkers from other viral infections. Here we will only perform an expression analysis for the RNA-seq count matrix provided by this study.
+The count matrix file was downloaded using [GEOquery](https://bioconductor.org/packages/release/bioc/html/GEOquery.html)[@GEOquery] version 2.55.1.
+
