@@ -10,10 +10,15 @@ knitr::opts_chunk$set(echo = FALSE)
 
 Feifei Li \
 \<ff.li@mail.utoronto.ca\> \
-4th year undergraduate student of Bioinformatics and Computational Biology specialist, \
-Majoring in Statistics \
+University of Toronto\
+4th year undergraduate Bioinformatics and Computational Biology specialist, \
+Majoring in statistics \
 
 
-This blog is dedicated to documenting my learning path of bioinformatics. \
+_Speak, then, and tell everything.  For, it comforts those in pain._\
+_To know before hand all the agony they still must bear._\
+-- ___Aeschylus, Prometheus Bound___
 
-It is still under construction.
+This blog is dedicated to documenting my learning journey of bioinformatics,
+and share my experience in hopes of helping those who are facing the same problems
+as I have encountered (and solved).\
