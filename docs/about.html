@@ -2679,6 +2679,18 @@ function setTheme() {
 
 darkmodeToggle.addEventListener('click', switchTheme)
 </script>
+<!-- Add function to open links to external links in new tab, from: -->
+<!-- https://yihui.name/en/2018/09/target-blank/ -->
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
 <!--/radix_placeholder_site_after_body-->
 <!--radix_placeholder_appendices-->
 <div class="appendix-bottom">
@@ -2744,9 +2756,6 @@ darkmodeToggle.addEventListener('click', switchTheme)
         Rmarkdown
     </a>.
 </p>
-<!-- Add function to open links to external links in new tab, from: -->
-<!-- https://yihui.name/en/2018/09/target-blank/ -->
-<script src="js/external-link.js"></script>
 <p>
     <span style="font-size:0.8rem;">
         <script>
