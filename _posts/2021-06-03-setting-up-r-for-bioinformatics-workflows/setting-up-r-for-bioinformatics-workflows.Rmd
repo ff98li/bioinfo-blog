@@ -1,0 +1,264 @@
+---
+title: "Setting Up R for Bioinformatics Workflows"
+description: |
+    A Windows user oriented guide to the initial set-up for R.
+author:
+    - name: Feifei Li
+      url: {}
+date: 6-03-2021
+bibliography: biblio.bib
+output:
+    distill::distill_article:
+      self_contained: false
+      toc: TRUE
+categories:
+    - R
+    - bioconductor
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(eval = FALSE)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+I decided to write this because some of the steps in setting up R for
+the new version of Bioconductor could get painful on Windows,
+and they never teach you this in school.
+On UNIX/Linux getting things set up could simply take one or two commands.
+
+## R Setup
+
+To readers who would like to follow the guide to set up R step-by-step,
+I recommend you set up the package directory first
+(see [R Package Directory](#r-pkg-dir)) if you have never done so.
+
+### R Version
+
+We are going to use Bioconductor extensively in this workflow.
+Each version of Bioconductor has different requirements for R version
+(see [Bioconductor](https://www.bioconductor.org/install/)).
+Here I decide to use the latest version of Bioconductor
+(till the date this post is created),
+which requires R version __4.1.0__ or higher.
+
+To check if you have the right version of R installed:
+
+```{r updateR, eval=FALSE}
+## Get the current version of R on your computer
+Rver <- unlist(
+    regmatches(R.version.string,
+               regexec("(\\d+).(\\d+).(\\d+)", R.version.string)
+    )
+)[1]
+## Update R if your R version is below the requirement
+if (Rver <= "4.1.0") {
+    if (!requireNamespace("installr", quietly = TRUE)) {
+        if(!requireNamespace("devtools", quietly = TRUE)) {
+            ## install installr from CRAN if no devtools
+            install.packages("installr")
+        } else {
+            ## use devtools to install the latest installr version from GitHub
+            devtools::install_github('talgalili/installr')
+        }
+    }
+    installr::updateR()
+}
+```
+
+<code>requireNamespace("installr")</code> checks whether the package 
+<code>installr</code> was already installed in R before.
+It returns a boolean value indicating whether the package was installed,
+along with a message prompted in R console
+if you didn't set <code>quitely = TRUE</code>.
+You might have seen many people uses <code>require()</code>,
+which also returns a boolean value.
+The difference is, <code>require</code> also automatically loads
+the package if installed, or downloads if not.
+This means using <code>requireNamespace("installr")</code> is always
+a better option for checking package installation.
+You should always avoid <code>load()</code>.
+
+
+I didn't load the package with <code>library(package.name)</code>
+to use the function in the package, which is commonly what people do.
+Instead, I call the function by <code>package.name::function.name()</code>,
+and I encourage the readers to do this
+because it explicitly tells those people who are reading your code
+from which packages those functions come from.
+It might also help you understand better when you come back to look at your code.
+I prefer to keep things explicitly because it avoids confusions.
+However, there indeed exists exceptions where a package is required to be loaded
+using <code>library()</code>,
+which we will see later when we try to map HGNC symbols from Entrez ID's.
+
+Enough of lecturing, we come back to the R setup itself.
+Once the code above is run, you will be prompted to install the latest version of R
+if the current version of R on your computer does not meet the requirement.
+Once the installation is complete,
+restart RStudio.
+Don't just use the <code>Session > Restart R</code>
+because it won't switch to the latest installed R version in RStudio.
+In the new R session,
+check your package library directory with <code>.libpaths()</code> as
+the newly updated R will change it to the R version specific directory.
+If the User installation was selected during the installation,
+the directory could be <code>C:\User\$env:USERNAME\Documents\R\win-library</code>.
+If the default system installation was selected, it could be
+<code>C:\Program Files\R\R-4.1.0\library</code>.
+Sometimes it ends up in
+<code>X:\{your R directory}\R-4.1.0\library</code>.
+
+You might want to change it if these are not what you want.
+
+### R Package Directory {#r-pkg-dir}
+
+For me, I have a dedicated directory for R packages.
+This way, I won't need to suffer from re-installing or migrating R packages
+from the previous version of R after an update.
+To change the default R package directory, enter the following in PowerShell:
+
+```
+Add-Content C:\Users\$env:USERNAME\Documents\.Renviron R_LIBS="{path to your package directory}"
+Add-Content C:\Users\$env:USERNAME\Documents\.Renviron R_LIBS_USER="{path to your package directory}\\user"
+Add-Content C:\Users\$env:USERNAME\Documents\.Renviron R_LIBS_SITE="{path to your package directory}\\site"
+```
+
+Don't forget double slashes in the directory path.
+
+If this is your first time setting up a default package library,
+after the update you will have to re-install <code>knitr</code> and <code>rmarkdown</code>.
+
+
+## Bioconductor
+
+A must-have for bioinformatics workflows.
+
+### BiocManager
+
+Here we will install the latest release of Bioconductor 3.13:
+
+```{r install-Bioc, warning=FALSE, echo=FALSE, eval=FALSE}
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install(version = "3.13")
+```
+
+It doesn't get you the whole Bioconductor installed.
+This is because Bioconductor itself is not really "a piece of software",
+but a collection of over 1000 R packages,[@bioc]
+which takes forever to install on a single machine at a time.
+So <code>BiocManager</code> is more of a package manager like the CRAN project,
+just as its package name suggests.
+
+### Packages
+
+Bioconductor follows a package release schedule different from CRAN,
+so to install Bioinformatics, we don't use <code>install.packages()</code>,
+but instead, for example, to install <code>edgeR</code>,
+a package extensively used in processing RNA-seq data:
+
+```{r install-edgeR, warning=FALSE, echo=FALSE, eval=FALSE}
+if (!requireNamespace("edgeR", quietly = TRUE))
+    BiocManager::install("edgeR", ask = FALSE)
+```
+
+## R Startup Behaviour
+
+<code>Rprofile.site</code> file allows users to define the behaviours
+at starup and the end of an R session.
+R will source <code>Rprofile.site</code> at startup.
+On Windows, it is located in <code>X:\{path to your R installation}\R-4.1.0\etc</code>.
+It should be there. If not, just create an empty text file and rename it.
+In case you confuse it with <code>.Rprofile</code>,
+they are equivalent; the latter is the way they name it on UNIX/Linux.
+
+### Tab Width
+
+RStudio by deafult uses a tab width of 2 spaces,
+which is consistent with the Google’s R Style Guide and the Tidyverse Style Guide.
+If you would like to follow the Bioconductor Style Guide, which uses 4 spaces, then
+add this to your <code>Rprofile.site</code> at the top:
+
+```{r}
+options(tab.width = 4)
+```
+
+And welcome to the 4-tab camp:)
+
+### .First
+
+<code>.First</code> is the function in <code>Rprofile.site</code> that
+actually allows you to define the startup behaviour of an R session:
+
+```{r}
+.First <- function(){
+    the first thing you want at startup
+    the second thing you want at startup
+}
+```
+
+
+#### Working Directory
+
+R resets to a default "working directory" (most likely where you installed R)
+every time you open it,
+if your RStudio is not loaded with a R project <code>.Rproj</code>.
+It could get annoying that you have to set it to your own the working directory mannualy 
+(if you have created one) with
+
+```{r setwd, eval=FALSE}
+.First <- function(){
+    setwd("{path to your working directory}")
+}
+```
+
+You can also load your helper functions from your utility scripts at startup:
+
+```{r load-util, eval=FALSE}
+.First <- function(){
+    setwd("{path to your working directory}")
+    source("{path to your utility scripts}")
+}
+```
+
+### .Last
+
+Similar to <code>.First</code>,
+it defines the end behaviour of an R session.
+
+#### Saving R Objects
+
+To save a single R object (variables, functions, dataframe, etc.) as a file
+everytime closing an R session:
+
+```{r}
+.Last <- function(){
+    save(object_to_save, file = ".\\data\\name_of_object.RData")
+}
+```
+
+where <code>data</code> is a directory to store data in the working directory,
+if you have created one.
+
+And to load the object:
+
+```{r}
+load(".\\data\\name_of_object.RData")
+```
+
+which could also be added to your <code>.First</code>
+if you need to use the object every time.
+
+## Writing at the end
+
+I know _Docker_ is a popular option out there for bioinformatics pipelines.
+It creates a consistent environment specific to the pipeline
+regardless of the operating system it is running on,
+and saves this hustle to configure R.
+The out-of-box feature is nice, but the downside is,
+Docker containers running in the background
+eats up computational resources (e.g. memory).
+In addition, if R runs in a Docker container,
+when communicating with some bioinformatics tools running on the host via their R API,
+some re-mapping of files or ports will be required.
