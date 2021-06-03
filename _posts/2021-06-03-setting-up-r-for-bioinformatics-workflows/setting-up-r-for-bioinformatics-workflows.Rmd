@@ -138,7 +138,7 @@ A must-have for bioinformatics workflows.
 
 Here we will install the latest release of Bioconductor 3.13:
 
-```{r install-Bioc, warning=FALSE, echo=FALSE, eval=FALSE}
+```{r install-Bioc, warning=FALSE, eval=FALSE}
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 BiocManager::install(version = "3.13")
@@ -158,7 +158,7 @@ so to install Bioinformatics, we don't use <code>install.packages()</code>,
 but instead, for example, to install <code>edgeR</code>,
 a package extensively used in processing RNA-seq data:
 
-```{r install-edgeR, warning=FALSE, echo=FALSE, eval=FALSE}
+```{r install-edgeR, warning=FALSE, eval=FALSE}
 if (!requireNamespace("edgeR", quietly = TRUE))
     BiocManager::install("edgeR", ask = FALSE)
 ```

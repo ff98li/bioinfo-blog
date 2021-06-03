@@ -2722,13 +2722,22 @@ d-appendix d-footnote-list a.footnote-backlink {
 <h3 id="biocmanager">BiocManager</h3>
 <p>Here we will install the latest release of Bioconductor 3.13:</p>
 <div class="layout-chunk" data-layout="l-body">
-
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='kw'>if</span> <span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/ns-load.html'>requireNamespace</a></span><span class='op'>(</span><span class='st'>"BiocManager"</span>, quietly <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span>
+    <span class='fu'><a href='https://rdrr.io/r/utils/install.packages.html'>install.packages</a></span><span class='op'>(</span><span class='st'>"BiocManager"</span><span class='op'>)</span>
+<span class='fu'>BiocManager</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/BiocManager/man/install.html'>install</a></span><span class='op'>(</span>version <span class='op'>=</span> <span class='st'>"3.13"</span><span class='op'>)</span>
+</code></pre>
+</div>
 </div>
 <p>It doesn’t get you the whole Bioconductor installed. This is because Bioconductor itself is not really “a piece of software”, but a collection of over 1000 R packages,<span class="citation" data-cites="bioc">(Gentleman et al. <a href="#ref-bioc" role="doc-biblioref">2004</a>)</span> which takes forever to install on a single machine at a time. So <code>BiocManager</code> is more of a package manager like the CRAN project, just as its package name suggests.</p>
 <h3 id="packages">Packages</h3>
 <p>Bioconductor follows a package release schedule different from CRAN, so to install Bioinformatics, we don’t use <code>install.packages()</code>, but instead, for example, to install <code>edgeR</code>, a package extensively used in processing RNA-seq data:</p>
 <div class="layout-chunk" data-layout="l-body">
-
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='kw'>if</span> <span class='op'>(</span><span class='op'>!</span><span class='fu'><a href='https://rdrr.io/r/base/ns-load.html'>requireNamespace</a></span><span class='op'>(</span><span class='st'>"edgeR"</span>, quietly <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span>
+    <span class='fu'>BiocManager</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/BiocManager/man/install.html'>install</a></span><span class='op'>(</span><span class='st'>"edgeR"</span>, ask <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span>
+</code></pre>
+</div>
 </div>
 <h2 id="r-startup-behaviour">R Startup Behaviour</h2>
 <p><code>Rprofile.site</code> file allows users to define the behaviours at starup and the end of an R session. R will source <code>Rprofile.site</code> at startup. On Windows, it is located in <code>X:{path to your R installation}-4.1.0</code>. It should be there. If not, just create an empty text file and rename it. In case you confuse it with <code>.Rprofile</code>, they are equivalent; the latter is the way they name it on UNIX/Linux.</p>
