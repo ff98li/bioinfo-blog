@@ -118,7 +118,7 @@ This way, I won't need to suffer from re-installing or migrating R packages
 from the previous version of R after an update.
 To change the default R package directory, enter the following in PowerShell:
 
-```
+```{powershell}
 Add-Content C:\Users\$env:USERNAME\Documents\.Renviron R_LIBS="{path to your package directory}"
 Add-Content C:\Users\$env:USERNAME\Documents\.Renviron R_LIBS_USER="{path to your package directory}\\user"
 Add-Content C:\Users\$env:USERNAME\Documents\.Renviron R_LIBS_SITE="{path to your package directory}\\site"

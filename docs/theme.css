@@ -35,6 +35,7 @@ html {
   --darkmode-text:      #FFFFFF;
   --darkmode-contrast:  #BB86FC;
   --darkmode-error:     #CF6679;
+  --darkmode-code-bg:   #212121;
   /* Lightmode */
   --lightmode-error:    #B00020;
   --lightmode-contrast: #ff6700;
@@ -105,9 +106,10 @@ d-article a:hover {
 }
 
 /* -- HOME CATEGORIES -- */
-posts-sidebar a:hover {
-  color:         var(--lightmode-contrast);
-  border-color:  var(--lightmode-contrast);
+
+.categories li>a:hover {
+    color:         var(--lightmode-contrast);
+    border-bottom: none;
 }
 
 /*-- WEBSITE HEADER + FOOTER --*/
@@ -231,16 +233,22 @@ Retrieved from https://jmbuhr.de/posts/2021-03-14-making-a-darkmode-for-your-dis
   border-color: var(--darkmode-contrast);
 }
 
+d-appendix .citation-appendix, .d-appendix .citation-appendix {
+  background: var(--darkmode-code-bg);
+}
+
 /*-- Categorical tags on main page --*/
 
 .darkmode .categories li > * {
   color:         var(--darkmode-text);
-  border-color:  var(--darkmode-text);
 }
 
-.darkmode posts-sidebar a:hover {
-  color:         var(--darkmode-contrast);
-  border-color:  var(--darkmode-contrast);
+.darkmode .categories li>a:hover {
+    color:         var(--darkmode-contrast);
+}
+
+.darkmode .categories .active {
+    color: var(--darkmode-contrast);
 }
 
 /*-- Categorical tags in blogs --*/
@@ -275,7 +283,7 @@ Retrieved from https://jmbuhr.de/posts/2021-03-14-making-a-darkmode-for-your-dis
 /* -- CODE CHUNK -- */
 .darkmode d-article div.sourceCode,
 .darkmode code {
-  background-color: var(--darkmode-bg);
+  background-color: var(--darkmode-code-bg);
 }
 
 .darkmode d-article pre {

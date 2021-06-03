@@ -2171,6 +2171,7 @@ html {
   --darkmode-text:      #FFFFFF;
   --darkmode-contrast:  #BB86FC;
   --darkmode-error:     #CF6679;
+  --darkmode-code-bg:   #212121;
   /* Lightmode */
   --lightmode-error:    #B00020;
   --lightmode-contrast: #ff6700;
@@ -2241,9 +2242,10 @@ d-article a:hover {
 }
 
 /* -- HOME CATEGORIES -- */
-posts-sidebar a:hover {
-  color:         var(--lightmode-contrast);
-  border-color:  var(--lightmode-contrast);
+
+.categories li>a:hover {
+    color:         var(--lightmode-contrast);
+    border-bottom: none;
 }
 
 /*-- WEBSITE HEADER + FOOTER --*/
@@ -2367,16 +2369,22 @@ Retrieved from https://jmbuhr.de/posts/2021-03-14-making-a-darkmode-for-your-dis
   border-color: var(--darkmode-contrast);
 }
 
+d-appendix .citation-appendix, .d-appendix .citation-appendix {
+  background: var(--darkmode-code-bg);
+}
+
 /*-- Categorical tags on main page --*/
 
 .darkmode .categories li > * {
   color:         var(--darkmode-text);
-  border-color:  var(--darkmode-text);
 }
 
-.darkmode posts-sidebar a:hover {
-  color:         var(--darkmode-contrast);
-  border-color:  var(--darkmode-contrast);
+.darkmode .categories li>a:hover {
+    color:         var(--darkmode-contrast);
+}
+
+.darkmode .categories .active {
+    color: var(--darkmode-contrast);
 }
 
 /*-- Categorical tags in blogs --*/
@@ -2411,7 +2419,7 @@ Retrieved from https://jmbuhr.de/posts/2021-03-14-making-a-darkmode-for-your-dis
 /* -- CODE CHUNK -- */
 .darkmode d-article div.sourceCode,
 .darkmode code {
-  background-color: var(--darkmode-bg);
+  background-color: var(--darkmode-code-bg);
 }
 
 .darkmode d-article pre {
@@ -2702,9 +2710,11 @@ d-appendix d-footnote-list a.footnote-backlink {
 <p>You might want to change it if these are not what you want.</p>
 <h3 id="r-pkg-dir">R Package Directory</h3>
 <p>For me, I have a dedicated directory for R packages. This way, I won’t need to suffer from re-installing or migrating R packages from the previous version of R after an update. To change the default R package directory, enter the following in PowerShell:</p>
-<pre><code>Add-Content C:\Users\$env:USERNAME\Documents\.Renviron R_LIBS=&quot;{path to your package directory}&quot;
-Add-Content C:\Users\$env:USERNAME\Documents\.Renviron R_LIBS_USER=&quot;{path to your package directory}\\user&quot;
-Add-Content C:\Users\$env:USERNAME\Documents\.Renviron R_LIBS_SITE=&quot;{path to your package directory}\\site&quot;</code></pre>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode" id="cb1"><pre class="sourceCode powershell"><code class="sourceCode powershell"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">Add-Content</span> C:\Users\<span class="va">$env</span>:USERNAME\Documents\.<span class="fu">Renviron</span> R_LIBS=<span class="st">&quot;{path to your package directory}&quot;</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="fu">Add-Content</span> C:\Users\<span class="va">$env</span>:USERNAME\Documents\.<span class="fu">Renviron</span> R_LIBS_USER=<span class="st">&quot;{path to your package directory}\\user&quot;</span></span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="fu">Add-Content</span> C:\Users\<span class="va">$env</span>:USERNAME\Documents\.<span class="fu">Renviron</span> R_LIBS_SITE=<span class="st">&quot;{path to your package directory}\\site&quot;</span></span></code></pre></div>
+</div>
 <p>Don’t forget double slashes in the directory path.</p>
 <p>If this is your first time setting up a default package library, after the update you will have to re-install <code>knitr</code> and <code>rmarkdown</code>.</p>
 <h2 id="bioconductor">Bioconductor</h2>
