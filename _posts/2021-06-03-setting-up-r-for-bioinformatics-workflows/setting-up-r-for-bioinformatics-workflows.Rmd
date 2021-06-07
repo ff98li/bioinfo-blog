@@ -11,6 +11,7 @@ output:
     distill::distill_article:
       self_contained: false
       toc: TRUE
+creative_commons: CC BY
 categories:
     - R
     - bioconductor
@@ -35,7 +36,7 @@ I recommend you set up the package directory first
 
 ### R Version
 
-We are going to use Bioconductor extensively in this workflow.
+We are going to use Bioconductor extensively in various bioinformatics workflows.
 Each version of Bioconductor has different requirements for R version
 (see [Bioconductor](https://www.bioconductor.org/install/)).
 Here I decide to use the latest version of Bioconductor
@@ -107,7 +108,7 @@ the directory could be <code>C:\User\$env:USERNAME\Documents\R\win-library</code
 If the default system installation was selected, it could be
 <code>C:\Program Files\R\R-4.1.0\library</code>.
 Sometimes it ends up in
-<code>X:\{your R directory}\R-4.1.0\library</code>.
+<code>X:\\{your R directory}\R-4.1.0\library</code>.
 
 You might want to change it if these are not what you want.
 
