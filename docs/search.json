@@ -6,14 +6,14 @@
       "description": "My learning journal of bioinformatics.",
       "author": [],
       "contents": "\r\nFeifei Li\r\n<ff.li@mail.utoronto.ca>\r\nUniversity of Toronto\r\n4th year undergraduate Bioinformatics and Computational Biology specialist,\r\nMajoring in statistics\r\nSpeak, then, and tell everything. For, it comforts those in pain.To know before hand all the agony they still must bear.\r\n– Aeschylus, Prometheus Bound\r\nThis blog is dedicated to documenting my learning journey of bioinformatics, and share my experience in hopes of helping those who are facing the same problems as I have encountered (and solved).\r\n\r\n\r\n\r\n",
-      "last_modified": "2021-06-03T14:55:05-04:00"
+      "last_modified": "2021-06-22T16:56:10-04:00"
     },
     {
       "path": "index.html",
       "title": "Bioinformatics, R, and more",
       "author": [],
       "contents": "\r\n\r\n\r\n\r\n",
-      "last_modified": "2021-06-03T14:55:06-04:00"
+      "last_modified": "2021-06-22T16:56:11-04:00"
     }
   ],
   "collections": ["posts/posts.json"]

@@ -141,6 +141,10 @@ d-appendix p a:hover {
     border-color: var(--lightmode-contrast);
 }
 
+d-appendix .citation-appendix, .d-appendix .citation-appendix {
+    background: rgba(255, 250, 250, 1);
+}
+
 .social_footer {
     color: var(--body-color);
 }
@@ -239,7 +243,7 @@ Retrieved from https://jmbuhr.de/posts/2021-03-14-making-a-darkmode-for-your-dis
     border-color: var(--darkmode-contrast);
 }
 
-d-appendix .citation-appendix, .d-appendix .citation-appendix {
+.darkmode d-appendix .citation-appendix, .d-appendix .citation-appendix {
     background: var(--darkmode-code-bg);
 }
 
