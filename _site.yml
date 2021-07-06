@@ -1,5 +1,5 @@
 name: "bioinfo-blog"
-title: "Feifei Li"
+title: "ffli.dev"
 description: |
     Bioinformatics, R, and more
 output_dir: "docs"
@@ -13,7 +13,7 @@ navbar:
           href: https://github.com/ff98li
         - icon: fas fa-graduation-cap
         - icon: fas fa-lightbulb
-base_url: https://ff98li.github.io/bioinfo-blog/
+base_url: https://www.ffli.dev/
 collections:
   posts:
     share: [twitter, linkedin]
