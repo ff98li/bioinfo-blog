@@ -1,0 +1,691 @@
+---
+title: "GEO DataSets: Experiment Selection and Initial Processing"
+description: |
+    A walkthrough of processing bulk RNA-seq data from the GEO database purely in R.
+author:
+  - name: Feifei Li
+    url: {}
+date: 2021-07-05
+bibliography: biblio.bib
+output:
+  distill::distill_article:
+    self_contained: FALSE
+    toc: TRUE
+creative_commons: CC BY
+categories:
+    - R
+    - bioconductor
+    - bioinformatics
+preview: geo.gif
+---
+
+```{r setup, include=FALSE}
+library(kableExtra)
+knitr::opts_chunk$set(warning = FALSE,
+                      message = FALSE)
+```
+
+This article demonstrates a pure R workflow of
+finding experiments of interest,
+downloading datasets of experiments of interest
+from the Gene Expression Omnibus (GEO) database,
+and processing the bulk RNA-seq counts data.
+
+The readers are assumed to have certain degree of
+understanding of what the GEO database is.
+
+
+## Finding Experiments of Interest
+
+### GEO metadata repository: <code>GEOmetadb</code>
+
+<code>GEOmetadb</code> is a thin wrapper around a SQLite database
+into which all the most up-to-date NCBI GEO metadata that are
+associated with GEO samples (GSM), GEO platforms (GPL), GEO data series (GSE),
+and curated GEO datasets (GDS) are parsed.[@GEOmetadb]
+It enables querying the GEO database using R scripts without accessing the webpage.
+Although NCBI's public API to the NCBI Entrez system
+[__The E-utilities__](https://www.ncbi.nlm.nih.gov/books/NBK25501/) also
+also offers an option for scripting queries
+for finding datasets of interest in the GEO database,
+the E-utilities are difficult to use
+(e.g. might need HTTP POST calls for long queries)
+and require extra effort to learn.
+
+
+To install <code>GEOmetadb</code> via Bioconductor:
+
+```{r}
+if (!requireNamespace("GEOmetadb", quietly = TRUE))
+    BiocManager::install("GEOmetadb", ask = FALSE)
+```
+
+We will also create a directory <code>./data</code> dedicated to storing
+data files under the working directory:
+
+```{r}
+if(!dir.exists("./data")) {
+    dir.create("./data", showWarnings = FALSE)
+}
+```
+
+Then we download the SQLite database that has the GEO metadata
+into <code>./data</code> via <code>GEOmetadb</code>:
+
+```{r, warning=FALSE}
+# Download GEOmeta database if not found
+metadb <- file.path(".", "data", "GEOmetadb.sqlite")
+if(!file.exists(metadb)) {
+    ## avoid re-downloading the 11G database everytime running the script
+    metadb <- GEOmetadb::getSQLiteFile(destdir = "./data")
+}
+```
+
+
+### Querying GEO database
+
+For this demonstration, we are interested in experiments that:
+
+* were done in the recent 6 years
+* are studies on COVID-19 (SARS-CoV-2)
+* used native human cells or tissues
+* have RNA-seq data
+
+To build an query to find experiments that meet the above conditions:
+
+```{r}
+query <- paste(
+    "SELECT DISTINCT",
+    "gse.title,",
+    "gse.gse,",
+    "gpl.title AS platform,",
+    "gse.submission_date,",
+    "gse.supplementary_file",
+    "FROM",
+    "gse",
+    "JOIN gse_gpl ON gse_gpl.gse = gse.gse",
+    "JOIN gpl ON gse_gpl.gpl = gpl.gpl",
+    "WHERE",
+    "gse.submission_date > '2015-01-01' AND",           # not older than 6 years
+    "gse.title LIKE '%SARS-CoV-2%' AND ",                  # experiment on COVID
+    "gpl.organism LIKE '%Homo sapiens%' AND", # dataset of human cells or tissue
+    "gpl.technology LIKE '%high-throughput seq%'")                # RNA-seq data
+```
+
+The ER diagram for the GEOmetadb SQLite database is represented as the following.
+This might come in useful when constructing an SQL statement querying the database.
+
+![The entity-relationship diagram for the GEOmetadb database [@GEOmetadb]](./geometadb_er.png)
+
+For the GEO accession prefixes present in the figure:
+
+* <code>GSE</code>: Series
+    + An original submitter-supplied record that summarizes an experiment
+    + links together a group of related Samples and provides a focal point and description of the whole study
+    + may also contain tables describing extracted data, summary conclusions, or analyses
+* <code>GSM</code>: Sample
+    + describes the conditions under which an individual Sample was handled, the manipulations it underwent, and the abundance measurement of each element derived from it
+* <code>GPL</code>: Platform
+    + composed of a summary description of the array or sequencer and, for array-based Platforms, a data table defining the array template
+    + may reference many Samples that have been submitted by multiple submitters
+* <code>GDS</code>: DataSet
+    + ___Profiles___ are derived from DataSets
+        + A Profile consists of the expression measurements for an individual gene across all Samples in a DataSet
+
+
+To establish a connection with the SQLite database:
+
+```{r}
+# Establish connection to GEOmetadb.sqlite
+con <- DBI::dbConnect(drv    = RSQLite::SQLite(),   ## an object of SQLiteDriver
+                      dbname = metadb)
+```
+
+Note that packages <code>DBI</code> and <code>RSQLite</code>
+have already been implicitly installed as dependencies for <code>GEOmetadb</code>.
+Therefore we can directly make the function calls here.
+
+To submit the query to the database:
+
+```{r}
+result <- DBI::dbGetQuery(conn = con, statement = query) ## save query result
+```
+
+Closing connection to the database:
+
+```{r}
+DBI::dbDisconnect(con) ## close connection
+rm(con) ## not a necessary step, just wanna keep my workspace clean
+```
+
+### Filtering Query Result
+
+The SQL query result is returned as a list object by the wrapper function in R.
+The result should have the following columns:
+
+```{r}
+names(result)
+```
+
+We would like to select from only those experiments whose datasets
+contain RNA-seq count matrices:
+
+```{r}
+hasCounts <- result$supplementary_file[
+    grep(
+        result$supplementary_file,
+        pattern     = "count", ## keyword to look for in experiment data files
+        ignore.case = TRUE
+        )
+    ]
+```
+
+This extracts a vector of FTP links to the files that include RNA-seq counts.
+Then from the FTP links,
+we extract the GSE series numbers from their file names using regex:
+
+```{r}
+hasCounts_gse <- unlist(
+    regmatches(hasCounts,
+               regexec("GSE[0-9]{4,}[^/]", hasCounts)
+    )
+)
+SELECT_ROWS       <- result$gse %in% hasCounts_gse
+candidate_dataset <- result[SELECT_ROWS, ]
+```
+
+The GSE series numbers and titles of the qualified candidate experiments
+(<code>candidate_dataset</code>) that contain RNA-seq data are as follows:
+
+```{r, echo=FALSE}
+kbl(candidate_dataset[ , 1:2]) %>%
+    kable_paper() %>%
+    row_spec(row        = which(candidate_dataset$gse == "GSE152641"),
+             bold       = T,
+             color      = "white",
+             background = "#D7261E") %>%
+    scroll_box(width = "100%", height = "200px")
+```
+
+We choose [__GSE152641__](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE152641)
+from the candidate studies to be our experiment of interest for the following demonstration.
+
+```{r}
+series <- "GSE152641" ## GEO series ID
+```
+
+Always read the publication of the original experiment
+and understand the experiment before starting the analysis.
+
+### Overview of the chosen experiment
+
+The original study of [GSE152641](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE152641)[@GSE152641] performed expression analysis on genes of these 86 samples and compiled expression data of prior studies on six viruses: influenza, RSV, HRV, Ebola, Dengue, and SARS in an attempt to isolate COVID-19 biomarkers from other viral infections.
+The RNA-seq data was generated by profiling peripheral blood from **62 COVID-19 patients** and **24 healthy controls** via bulk RNA-seq.
+The RNA-seq count matrix in the data file consists of **20460 unique Entrez gene ID's** along the rows and 86 samples (biological replicates) along the columns.
+
+### Downloading Dataset
+
+<code>GEOquery</code> provides easy and quick methods
+for accessing data from GEO [@GEOquery]:
+
+```{r}
+if (!requireNamespace("GEOquery", quietly = TRUE))
+    BiocManager::install("GEOquery", ask = FALSE)
+```
+
+To download the RNA-seq data file for the corresponding GSE series number from GEO:
+
+```{r}
+## Get names of data files
+fname <- GEOquery::getGEOSuppFiles(GEO           = series,
+                                   fetch_files   = FALSE,  ## Don't download yet
+                                   makeDirectory = FALSE)$fname
+
+## Download the dataset if it's never downloaded into the data directory
+if (!file.exists(file.path(getwd(), "data", fname))) {
+    GEOquery::getGEOSuppFiles(GEO           = series,
+                              baseDir       = "./data",
+                              makeDirectory = FALSE)
+}
+```
+
+The dataset file has been downloaded in <code>./data</code>.
+Note that this experiment has only 1 supplementary file;
+some experiments could have more than just one.
+Therefore you might want to check what's in <code>fname</code>
+or look up [the GEO accession viewer](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi)
+before proceeding.
+
+## RNA-seq Counts Normalisation
+
+Normalising RNA-seq counts is a necessary step of initial data processing
+prior to the differential expression analysis.
+The reason is that direct comparison of raw count values does not account for
+the effects of factors that introduce systematic errors such as
+different gene lengths and GC-content between genes within a biological replicate,
+different sequencing depth between biological replicates, and
+true biological differences in RNA composition between biological replicates,
+which have a significant impact on downstream analysis
+(e.g. differential expression analysis).
+The goal of normalisation is to minimise the effects of systematic errors
+by taking into account these factors. \
+
+There exist various normalisation methods.
+They come with different assumptions and correct for different factors.
+Evans, C., Hardin, J., and Stoebel, D. M. have published a detailed review on
+several common normalisation methods (DESeq, Med, Q, RPKM and ERPKM, TMM, UQ)
+and discussed how to choose the appropriate normalisation method
+based on their assumptions. [@norm] \
+
+Here we use the trimmed mean of M-values (TMM) normalisation method
+implemented in <code>edgeR</code> [@edgeR1][@edgeR2]:
+
+```{r}
+if (!requireNamespace("edgeR", quietly = TRUE))
+    BiocManager::install("edgeR", ask = FALSE)
+```
+
+
+### TMM Normalisation
+
+The TMM approach assumes the majority of genes are not differentially expressed.
+It takes into account sequencing depth, gene length, and RNA composition,
+making the normalised count values comparable within and between samples.
+Readers can consult the original publication of TMM normalisation 
+for complete details of this method. [@TMM] \
+
+The following normalisation procedure is based on
+the edgeR differential expression analysis protocol, step 14. i-v. [@DE_protocol]
+
+#### Loading dataset
+
+```{r}
+covid19_exp <- read.csv(
+    file        = file.path(".", "data", fname),
+    header      = TRUE,
+    check.names = FALSE ## prevent R from messing up column names
+)
+```
+
+To view the first 5 genes of the count matrix:
+
+```{r, echo = FALSE}
+kable(head(covid19_exp, n = 5), format = "html") %>%
+  kable_styling() %>%
+  scroll_box(width = "700px", height = "100%")
+```
+
+Note that the name for the column of gene ID's is blank.
+Label the column to avoid confusion:
+
+```{r}
+colnames(covid19_exp)[1] <- "entrezgene_id" ## genes were labeled w/ Entrez ID's
+```
+
+
+
+#### Defining group
+
+This is an experiment with ___a simple design___:
+a simple comparison between two sample groups: COVID-19 and HC.[@GSE152641] \
+
+For most experiments in the GEO database,
+groups to which samples belong are usually indicated in samples' titles.
+This means we are able to define groups for samples using regex to check their titles,
+which are the column names of the count matrix.\
+
+It used to be the case for GSE152641.
+Samples that are in the healthy control group
+had <code>BRH</code> or <code>HMN</code> prefix in their titles,
+and those in the COVID-19 group had <code>ESC</code> prefix.
+However, the author of GSE152641 recently replaced
+the prefix in all of the samples' title with <code>IMX_sample</code>;
+in fact they changed the whole samples' titles.
+This means we can no longer identify samples' groups from their titles.
+The only way to find out their groups is look up their GSM accession numbers.
+Indeed, checking them one at a time on the GEO accession viewer and
+manually grouping them are lame.\
+
+We can again turn to <code>GEOquery</code> for retrieving samples' metadata
+associated with their GSM accession numbers:
+
+```{r}
+gse <- GEOquery::getGEO(GEO = series, GSEMatrix = FALSE)
+gsm <- GEOquery::GSMList(gse)
+```
+
+The metadata of the experiment GSE152641 in the GEO database
+is in [the SOFT format](https://www.ncbi.nlm.nih.gov/geo/info/soft.html).
+<code>GEOquery</code> can parse the metadata of GSE152641 into <code>GSE</code> class,
+and each sample's GSM data is in the list under the <code>GSE</code> object.\
+
+To view the first 5 samples' GSM accession numbers:
+
+```{r}
+head(names(gsm), n = 5)
+```
+
+And the metadata that we need from the first sample:
+
+```{r}
+GEOquery::Meta(gsm[[1]])[c(2, 31)]
+```
+
+Knowing these two pieces of information for each sample of the experiment,
+we are now able to define groups for the samples in R.
+The most R-ish way I've come up with so far without using for-loop:
+
+```{r}
+samples <- lapply(gsm,
+                  function(x) {
+                      group  <- unlist(
+                          regmatches(GEOquery::Meta(x)$characteristics_ch1[1],
+                                     regexec(
+                                         pattern = "(\\s).*",  ## match by space
+                                         GEOquery::Meta(x)$characteristics_ch1[1])
+                                     )
+                          )[1] ## using regex to extract sample group
+                      ## remove space at the beginning of a string
+                      group  <- gsub(pattern = "^\\s", "", group)
+                      sample <- GEOquery::Meta(x)$title
+                      return(
+                          data.frame(
+                              sample      = sample,
+                              group       = group,
+                              check.names = FALSE
+                              )
+                          )
+                    }
+                  )
+samples <- do.call(rbind, samples) ## combine the elements of a list
+```
+
+
+
+```{r, echo = FALSE}
+kbl(samples) %>%
+    kable_paper() %>%
+    scroll_box(width = "100%", height = "200px")
+```
+
+
+#### Normalising counts
+
+Create a numeric matrix of the read counts with the gene ID's as row names:
+
+```{r}
+counts           <- as.matrix(covid19_exp[2:87])
+rownames(counts) <- covid19_exp$entrezgene_id
+```
+
+According to the edgeR differential expression analysis protocol[@DE_protocol]:
+
+> "it is recommended to remove features without at least 1 read per million in n of the samples, where n is the size of the smallest group of replicates"
+
+Since we have only two groups: 24 healthy human controls and 62 COVID-19 patients,
+24 is the size is the smallest group of biological replicates here:
+
+```{r}
+cpms <- edgeR::cpm(counts)
+keep <- rowSums(cpms > 1) >= 24
+```
+
+```{r}
+counts <- counts[keep, ]
+```
+
+edgeR stores data in its own data class <code>DGEList</code>
+and performs analyses on it.
+Hence we need to first create a <code>DGEList</code> to store the read counts.\
+
+Note that although the edgeR documentation says
+the <code>DGEList</code> constructor takes
+a numeric matrix for its <code>counts</code> argument,
+the edgeR user guide says the <code>counts</code> argument can take
+either a matrix or a <code>data.frame</code> object.
+
+```{r}
+d <- edgeR::DGEList(
+  counts = counts,
+  group  = samples$group ## add the grouping factor
+  )
+```
+
+To estimate the scale factors between samples for TMM normalization:
+
+```{r}
+d <- edgeR::calcNormFactors(d)
+```
+
+Extract the normalised count matrix:
+
+```{r}
+normalised_counts <- edgeR::cpm(d)
+```
+
+### Distribution for read counts - Before vs. after normalisation
+
+Even though we are comparing the distributions for pre-normalised read counts
+and post-normalised read counts,
+we still normalise the pre-normalised read counts to counts per million (CPM)
+to account for differences in library sizes between samples for a comparable result.
+More precisely, we are comparing the distributions for
+two-fold changes in expression before and after TMM normalisation.
+Note that genes that were previously removed according to the protocol
+are also excluded in this comparison.
+
+```{r boxplot, code_folding = TRUE}
+par(mfrow = c(1, 2))
+
+boxplot(log2(counts),
+        xlab     = "Samples",
+        ylab     = "log2 CPM",
+        las      = 2,
+        cex      = 0.5,
+        cex.lab  = 0.75,
+        cex.axis = 0.25,
+        main     = "Before TMM Normalisation",
+        cex.main = 0.75)
+
+#draw the median on each box plot
+abline(h   = median(apply(log2(counts), MARGIN = 2, FUN = median)),
+       col = "green",
+       lwd = 0.75,
+       lty = 2)
+
+boxplot(log2(normalised_counts),
+        xlab     = "Samples",
+        ylab     = "log2 CPM",
+        las      = 2,
+        cex      = 0.5,
+        cex.lab  = 0.75,
+        cex.axis = 0.25,
+        main     = "After TMM Normalisation",
+        cex.main = 0.75)
+# draw the median on each box plot
+abline(h   = median(apply(log2(normalised_counts), MARGIN = 2,FUN = median)),
+       col = "green",
+       lwd = 0.75,
+       lty = 2)
+```
+
+```{r density, code_folding = TRUE}
+par(mfrow = c(1, 2))
+
+log2CPM_density <- apply(log2(counts),
+                         MARGIN = 2,
+                         FUN    = density)
+
+## Get the normalised fold change cpm
+normalised_log2CPM_density <- apply(log2(normalised_counts),
+                                    MARGIN = 2,
+                                    FUN    = density)
+
+## Calculate the limits across all the samples
+xlim <- 0; ylim <- 0
+for (i in seq_along(log2CPM_density)) {
+    xlim <- range(c(xlim, log2CPM_density[[i]]$x))
+    ylim <- range(c(ylim, log2CPM_density[[i]]$y))
+}
+for (i in seq_along(normalised_log2CPM_density)) {
+    xlim <- range(c(xlim, normalised_log2CPM_density[[i]]$x))
+    ylim <- range(c(ylim, normalised_log2CPM_density[[i]]$y))
+}
+
+## 86 line colours for all 86 samples
+cols <- rainbow(length(log2CPM_density))
+## choose line type 1 for density graphs of all 86 samples
+ltys <- rep(1, length(log2CPM_density))
+
+## Initialize the density plot without density lines
+plot(log2CPM_density[[1]],
+     xlim     = xlim,
+     ylim     = ylim,
+     type     = "n",
+     ylab     = "Smoothing density of log2-CPM",
+     main     = "Before TMM normalisation",
+     cex.main = 0.7,
+     cex.lab  = 0.75
+     )
+## Plot smoothing density for each sample
+for (i in seq_along(log2CPM_density)) {
+    lines(log2CPM_density[[i]],
+          col = cols[i])
+    }
+## Create legend for samples
+legend("topright",
+       colnames(counts),
+       col      = cols,
+       lty      = ltys,
+       cex      = 0.15,
+       border   = "blue",
+       text.col = "green4",
+       merge    = TRUE,
+       bg       = "gray90")
+
+
+
+
+
+## Initialize the density plot without density lines
+plot(normalised_log2CPM_density[[1]],
+     xlim     = xlim,
+     ylim     = ylim,
+     type     = "n",
+     ylab     = "Smoothing density of log2-CPM",
+     main     = "After TMM normalisation",
+     cex.main = 0.65,
+     cex.lab  = 0.75,
+     )
+
+## Plot smoothing density for each sample
+for (i in seq_along(normalised_log2CPM_density)) {
+    lines(normalised_log2CPM_density[[i]],
+          col = cols[i])
+    }
+## Create legend for samples
+legend("topright",
+       colnames(normalised_counts),
+       col      = cols,
+       lty      = ltys,
+       cex      = 0.15,
+       border   = "blue",
+       text.col = "green4",
+       merge    = TRUE,
+       bg       = "gray90")
+```
+
+The medians of distributions for normalised RNA-seq counts
+are much closer to each other.
+The interquartile ranges for the gene expression levels of each sample
+also become more consistent after normalisation applied.
+This means 50% of gene expression levels have similar distributions for each
+sample.
+
+
+## Post-normalisation Analysis
+
+### Biological coefficient of variation (BCV)
+
+To capture the variability in gene expressions
+between sample groups, we use group as target to build a model matrix:
+
+```{r}
+model_design <- model.matrix(~group, data = samples)
+```
+
+```{r, echo = FALSE}
+kbl(model_design) %>%
+    kable_paper() %>%
+    scroll_box(width = "100%", height = "200px")
+```
+
+```{r, code_folding = TRUE}
+d <- edgeR::estimateDisp(d, design = model_design)
+edgeR::plotBCV(d, col.tagwise = "black", col.common = "red",
+               main = "Common and Tag-wise Dispersion vs Expression Levels")
+```
+
+Dispersion is a parameter of a negative binomial model that describes how much variance deviates from the mean, while the BCV is the square root of the dispersion
+parameter under the negative binomial model.
+
+The BCV plot presents the estimated relative variability of expression between biological replicates; it illustrates the association between the biological CV and the average true gene abundance.
+
+The common dispersion line suggests all gene expression values vary by close to a BCV value of 0.5 among replicates.[@bcv]
+The tag-wise dispersion shows BCV values calculated individually for each gene. We observe that genes with higher true abundance (under the assumption that RNA-seq counts follow a negative binomial distribution) have lower BCV's than genes with lower abundance. This implies that the higher the true expression level of a gene has, the lower its variation in our samples.
+
+
+### Mean-variance relationship
+
+```{r, code_folding = TRUE}
+edgeR::plotMeanVar(
+    object                       = d,
+    show.raw.vars                = TRUE,
+    show.tagwise.vars            = TRUE,
+    NBline                       = TRUE,
+    show.ave.raw.vars            = TRUE,
+    show.binned.common.disp.vars = TRUE,
+    main                         = paste(
+        "Mean-variance Relationship for 14425 Genes of",
+        "COVID-19 Group and Healthy Control Group"),
+    cex.main                     = 0.8
+)
+```
+
+The mean-variance plot presents the modelling of the mean-variance relationship for the normalised expression values, which are split into bins by overall expression level in the model. The grey points represent the pooled gene-wise variances. The blue points on the mean-variance plot represent the estimated gene-wise variances. The red crosses represent the pooled gene-wise variances, while the dark red crosses represent the the average of the pooled variances for each bin of genes plotted against the average expression level of the genes in the bin. The blue line shows the mean-variance relationship for a negative binomial model with common dispersion.[@edgeR1][@edgeR2] We observe that all types of variances fit well along the negative binomial line.
+
+
+### Sample relations
+
+```{r, code_folding = TRUE}
+edgeR::plotMDS.DGEList(
+    d,
+    col      = c("#b7371d", "#51af84")[factor(samples$group)],
+    cex.axis = 0.75,
+    cex.lab  = 0.75,
+    main     = paste("Variation between Samples in Expression Level")
+    )
+legend("topleft",
+       lwd      = 2,
+       text.col = c("#51af84","#b7371d"),
+       legend   = c("Healthy control", "COVID19"),
+       lty      = 0,
+       cex      = 0.75)
+```
+
+The MDS plot presents variation among samples based on the normalised gene expression. The distances between each pair of samples on the MDS plot suggest
+how different these samples are in terms of
+log fold changes of the expression levels of the filtered genes.
+The healthy control and the COVID-19 patient samples form separate clusters along the plot in the leading logFC dimension 1.
+
+## To Do
+
+As the genes in this dataset were labeled with Entrez gene ID's,
+before performing any further analyses with the processed RNA-seq data,
+we need to map them to their HGNC names,
+which are how genes are referred in most annotation datasets and literatures,
+and more meaningful than simply numerical ID's.
+This step is supposed to be part of the initial processing;
+however, mappings produced by different databases vary in quality.
+I will compare the mapping results produced by 3 different databases and
+finish converting gene ID's in a later post. 

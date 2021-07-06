@@ -7,7 +7,19 @@
     <description>Bioinformatics, R, and more
 </description>
     <generator>Distill</generator>
-    <lastBuildDate>Thu, 03 Jun 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 05 Jul 2021 00:00:00 +0000</lastBuildDate>
+    <item>
+      <title>GEO DataSets: Experiment Selection and Initial Processing</title>
+      <dc:creator>Feifei Li</dc:creator>
+      <link>https://ff98li.github.io/bioinfo-blog/posts/2021-07-05-geo-datasets-experiment-selection-and-initial-processing</link>
+      <description>A walkthrough of processing bulk RNA-seq data from the GEO database purely in R.</description>
+      <category>R</category>
+      <category>bioconductor</category>
+      <category>bioinformatics</category>
+      <guid>https://ff98li.github.io/bioinfo-blog/posts/2021-07-05-geo-datasets-experiment-selection-and-initial-processing</guid>
+      <pubDate>Mon, 05 Jul 2021 00:00:00 +0000</pubDate>
+      <media:content url="https://ff98li.github.io/bioinfo-blog/posts/2021-07-05-geo-datasets-experiment-selection-and-initial-processing/geo.gif" medium="image" type="image/gif"/>
+    </item>
     <item>
       <title>Setting Up R for Bioinformatics Workflows</title>
       <dc:creator>Feifei Li</dc:creator>
