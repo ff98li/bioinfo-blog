@@ -37,7 +37,7 @@ understanding of what the GEO database is.
 
 ## Finding Experiments of Interest
 
-### GEO metadata repository: <code>GEOmetadb</code>
+### GEO metadata repository: GEOmetadb
 
 <code>GEOmetadb</code> is a thin wrapper around a SQLite database
 into which all the most up-to-date NCBI GEO metadata that are

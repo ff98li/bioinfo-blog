@@ -2683,7 +2683,7 @@ d-appendix d-footnote-list a.footnote-backlink {
 <ul>
 <li><a href="#finding-experiments-of-interest">Finding Experiments of Interest</a>
 <ul>
-<li><a href="#geo-metadata-repository-geometadb">GEO metadata repository: <code>GEOmetadb</code></a></li>
+<li><a href="#geo-metadata-repository-geometadb">GEO metadata repository: GEOmetadb</a></li>
 <li><a href="#querying-geo-database">Querying GEO database</a></li>
 <li><a href="#filtering-query-result">Filtering Query Result</a></li>
 <li><a href="#overview-of-the-chosen-experiment">Overview of the chosen experiment</a></li>
@@ -2707,7 +2707,7 @@ d-appendix d-footnote-list a.footnote-backlink {
 <p>This article demonstrates a pure R workflow of finding experiments of interest, downloading datasets of experiments of interest from the Gene Expression Omnibus (GEO) database, and processing the bulk RNA-seq counts data.</p>
 <p>The readers are assumed to have certain degree of understanding of what the GEO database is.</p>
 <h2 id="finding-experiments-of-interest">Finding Experiments of Interest</h2>
-<h3 id="geo-metadata-repository-geometadb">GEO metadata repository: <code>GEOmetadb</code></h3>
+<h3 id="geo-metadata-repository-geometadb">GEO metadata repository: GEOmetadb</h3>
 <p><code>GEOmetadb</code> is a thin wrapper around a SQLite database into which all the most up-to-date NCBI GEO metadata that are associated with GEO samples (GSM), GEO platforms (GPL), GEO data series (GSE), and curated GEO datasets (GDS) are parsed.<span class="citation" data-cites="GEOmetadb">(<a href="#ref-GEOmetadb" role="doc-biblioref">Zhu et al. 2008</a>)</span> It enables querying the GEO database using R scripts without accessing the webpage. Although NCBI’s public API to the NCBI Entrez system <a href="https://www.ncbi.nlm.nih.gov/books/NBK25501/"><strong>The E-utilities</strong></a> also also offers an option for scripting queries for finding datasets of interest in the GEO database, the E-utilities are difficult to use (e.g. might need HTTP POST calls for long queries) and require extra effort to learn.</p>
 <p>To install <code>GEOmetadb</code> via Bioconductor:</p>
 <div class="layout-chunk" data-layout="l-body">
