@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/" version="2.0">
   <channel>
-    <title>Feifei Li</title>
-    <link>https://ff98li.github.io/bioinfo-blog/</link>
-    <atom:link href="https://ff98li.github.io/bioinfo-blog/index.xml" rel="self" type="application/rss+xml"/>
+    <title>ffli.dev</title>
+    <link>https://www.ffli.dev/</link>
+    <atom:link href="https://www.ffli.dev/index.xml" rel="self" type="application/rss+xml"/>
     <description>Bioinformatics, R, and more
 </description>
     <generator>Distill</generator>
@@ -11,34 +11,34 @@
     <item>
       <title>GEO DataSets: Experiment Selection and Initial Processing</title>
       <dc:creator>Feifei Li</dc:creator>
-      <link>https://ff98li.github.io/bioinfo-blog/posts/2021-07-05-geo-datasets-experiment-selection-and-initial-processing</link>
+      <link>https://www.ffli.dev/posts/2021-07-05-geo-datasets-experiment-selection-and-initial-processing</link>
       <description>A walkthrough of processing bulk RNA-seq data from the GEO database purely in R.</description>
       <category>R</category>
       <category>bioconductor</category>
       <category>bioinformatics</category>
-      <guid>https://ff98li.github.io/bioinfo-blog/posts/2021-07-05-geo-datasets-experiment-selection-and-initial-processing</guid>
+      <guid>https://www.ffli.dev/posts/2021-07-05-geo-datasets-experiment-selection-and-initial-processing</guid>
       <pubDate>Mon, 05 Jul 2021 00:00:00 +0000</pubDate>
-      <media:content url="https://ff98li.github.io/bioinfo-blog/posts/2021-07-05-geo-datasets-experiment-selection-and-initial-processing/geo.gif" medium="image" type="image/gif"/>
+      <media:content url="https://www.ffli.dev/posts/2021-07-05-geo-datasets-experiment-selection-and-initial-processing/geo.gif" medium="image" type="image/gif"/>
     </item>
     <item>
       <title>Setting Up R for Bioinformatics Workflows</title>
       <dc:creator>Feifei Li</dc:creator>
-      <link>https://ff98li.github.io/bioinfo-blog/posts/2021-06-03-setting-up-r-for-bioinformatics-workflows</link>
+      <link>https://www.ffli.dev/posts/2021-06-03-setting-up-r-for-bioinformatics-workflows</link>
       <description>A Windows user oriented guide to the initial set-up for R.</description>
       <category>R</category>
       <category>bioconductor</category>
-      <guid>https://ff98li.github.io/bioinfo-blog/posts/2021-06-03-setting-up-r-for-bioinformatics-workflows</guid>
+      <guid>https://www.ffli.dev/posts/2021-06-03-setting-up-r-for-bioinformatics-workflows</guid>
       <pubDate>Thu, 03 Jun 2021 00:00:00 +0000</pubDate>
     </item>
     <item>
       <title>Setting up my distill blog</title>
       <dc:creator>Feifei Li</dc:creator>
-      <link>https://ff98li.github.io/bioinfo-blog/posts/2021-05-04-setting-up-my-distill-blog</link>
+      <link>https://www.ffli.dev/posts/2021-05-04-setting-up-my-distill-blog</link>
       <description>Starting my learning journal of bioinformatics.</description>
       <category>misc.</category>
-      <guid>https://ff98li.github.io/bioinfo-blog/posts/2021-05-04-setting-up-my-distill-blog</guid>
+      <guid>https://www.ffli.dev/posts/2021-05-04-setting-up-my-distill-blog</guid>
       <pubDate>Tue, 04 May 2021 00:00:00 +0000</pubDate>
-      <media:content url="https://ff98li.github.io/bioinfo-blog/posts/2021-05-04-setting-up-my-distill-blog/distill.png" medium="image" type="image/png" width="2521" height="2911"/>
+      <media:content url="https://www.ffli.dev/posts/2021-05-04-setting-up-my-distill-blog/distill.png" medium="image" type="image/png" width="2521" height="2911"/>
     </item>
   </channel>
 </rss>
