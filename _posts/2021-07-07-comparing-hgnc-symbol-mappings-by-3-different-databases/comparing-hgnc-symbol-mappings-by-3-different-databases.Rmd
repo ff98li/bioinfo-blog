@@ -41,7 +41,9 @@ after filtering genes with low counts in
 
 ## biomaRt
 
-
+[<code>biomaRt</code>](10.18129/B9.bioc.biomaRt) is perhaps the most popular
+choice for mapping gene identifiers in R.
+It provides wrappers that executes direct SQL queries to the BioMart databases (e.g. Ensembl).[@biomart1]
 
 ```{r}
 if (!requireNamespace("biomaRt", quietly = TRUE))
