@@ -1,5 +1,28 @@
 [
   {
+    "path": "posts/2021-07-07-comparing-hgnc-symbol-mappings-by-3-different-databases/",
+    "title": "Comparing HGNC Symbol Mappings by 3 Different Databases",
+    "description": "Mapping from Entrez gene ID's to HGNC gene symbols for genes in GSE152641 using biomaRt, BridgeDbR, and org.Hs.eg.db.",
+    "author": [
+      {
+        "name": "Feifei Li",
+        "url": {}
+      }
+    ],
+    "date": "2021-07-07",
+    "categories": [
+      "R",
+      "bioconductor",
+      "bioinformatics"
+    ],
+    "contents": "\r\nThis post is a continuation of the initial processing of GSE152641 RNA-seq data.\r\n\r\n\r\n\r\n",
+    "preview": "posts/2021-07-07-comparing-hgnc-symbol-mappings-by-3-different-databases/biomart.png",
+    "last_modified": "2021-07-07T18:24:17-04:00",
+    "input_file": "comparing-hgnc-symbol-mappings-by-3-different-databases.knit.md",
+    "preview_width": 250,
+    "preview_height": 99
+  },
+  {
     "path": "posts/2021-07-05-geo-datasets-experiment-selection-and-initial-processing/",
     "title": "GEO DataSets: Experiment Selection and Initial Processing",
     "description": "A walkthrough of processing bulk RNA-seq data from the GEO database purely in R.",

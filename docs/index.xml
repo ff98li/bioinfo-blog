@@ -7,7 +7,19 @@
     <description>Bioinformatics, R, and more
 </description>
     <generator>Distill</generator>
-    <lastBuildDate>Mon, 05 Jul 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 07 Jul 2021 00:00:00 +0000</lastBuildDate>
+    <item>
+      <title>Comparing HGNC Symbol Mappings by 3 Different Databases</title>
+      <dc:creator>Feifei Li</dc:creator>
+      <link>https://www.ffli.dev/posts/2021-07-07-comparing-hgnc-symbol-mappings-by-3-different-databases</link>
+      <description>Mapping from Entrez gene ID's to HGNC gene symbols for genes in GSE152641 using biomaRt, BridgeDbR, and org.Hs.eg.db.</description>
+      <category>R</category>
+      <category>bioconductor</category>
+      <category>bioinformatics</category>
+      <guid>https://www.ffli.dev/posts/2021-07-07-comparing-hgnc-symbol-mappings-by-3-different-databases</guid>
+      <pubDate>Wed, 07 Jul 2021 00:00:00 +0000</pubDate>
+      <media:content url="https://www.ffli.dev/posts/2021-07-07-comparing-hgnc-symbol-mappings-by-3-different-databases/biomart.png" medium="image" type="image/png" width="250" height="99"/>
+    </item>
     <item>
       <title>GEO DataSets: Experiment Selection and Initial Processing</title>
       <dc:creator>Feifei Li</dc:creator>
