@@ -327,7 +327,7 @@ colnames(covid19_exp)[1] <- "entrezgene_id" ## genes were labeled w/ Entrez ID's
 #### Defining group
 
 This is an experiment with ___a simple design___:
-a simple comparison between two sample groups: COVID-19 and HC.[@GSE152641] \
+a simple comparison between two sample groups: COVID-19 and healthy control.[@GSE152641] \
 
 For most experiments in the GEO database,
 groups to which samples belong are usually indicated in samples' titles.
@@ -422,6 +422,10 @@ According to the edgeR differential expression analysis protocol[@DE_protocol]:
 
 > "it is recommended to remove features without at least 1 read per million in n of the samples, where n is the size of the smallest group of replicates"
 
+The reason is that a gene must be expressed at some minimal level
+before it can be translated into a protein.
+This means genes with very low counts across all libraries provide little evidence for differential expression.
+
 Since we have only two groups: 24 healthy human controls and 62 COVID-19 patients,
 24 is the size is the smallest group of biological replicates here:
 
@@ -429,6 +433,17 @@ Since we have only two groups: 24 healthy human controls and 62 COVID-19 patient
 cpms <- edgeR::cpm(counts)
 keep <- rowSums(cpms > 1) >= 24
 ```
+
+Or alternatively, by the Bioconductor edgeR user guide:
+
+```{r, eval = FALSE}
+keep <- edgeR::filterByExpr(cpms, group = samples$group)
+```
+
+It comes down users' preferences for whichever method to use;
+they produce the same result.\
+
+And we only keep genes that meet the threshold of at least 1 read per million in 24 of the samples:
 
 ```{r}
 counts <- counts[keep, ]
@@ -661,16 +676,18 @@ The mean-variance plot presents the modelling of the mean-variance relationship 
 edgeR::plotMDS.DGEList(
     d,
     col      = c("#b7371d", "#51af84")[factor(samples$group)],
+    main     = paste("Variation between Samples in Expression Level"),
+    cex.main = 1,
+    cex      = 0.5,
     cex.axis = 0.75,
-    cex.lab  = 0.75,
-    main     = paste("Variation between Samples in Expression Level")
+    cex.lab  = 0.75
     )
 legend("topleft",
        lwd      = 2,
        text.col = c("#51af84","#b7371d"),
        legend   = c("Healthy control", "COVID19"),
        lty      = 0,
-       cex      = 0.75)
+       cex      = 0.5)
 ```
 
 The MDS plot presents variation among samples based on the normalised gene expression. The distances between each pair of samples on the MDS plot suggest

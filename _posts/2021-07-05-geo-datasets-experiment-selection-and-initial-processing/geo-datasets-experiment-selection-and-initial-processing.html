@@ -127,7 +127,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   <!--/radix_placeholder_rmarkdown_metadata-->
   
   <script type="text/json" id="radix-resource-manifest">
-  {"type":"character","attributes":{},"value":["biblio.bib","data/GEOmetadb.sqlite","data/GSE152641_Inflammatix_COVID19_counts_entrez.csv.gz","geo-datasets-experiment-selection-and-initial-processing_files/anchor-4.2.2/anchor.min.js","geo-datasets-experiment-selection-and-initial-processing_files/bowser-1.9.3/bowser.min.js","geo-datasets-experiment-selection-and-initial-processing_files/distill-2.2.21/template.v2.js","geo-datasets-experiment-selection-and-initial-processing_files/figure-html5/boxplot-1.png","geo-datasets-experiment-selection-and-initial-processing_files/figure-html5/density-1.png","geo-datasets-experiment-selection-and-initial-processing_files/figure-html5/unnamed-chunk-32-1.png","geo-datasets-experiment-selection-and-initial-processing_files/figure-html5/unnamed-chunk-33-1.png","geo-datasets-experiment-selection-and-initial-processing_files/figure-html5/unnamed-chunk-34-1.png","geo-datasets-experiment-selection-and-initial-processing_files/header-attrs-2.8.6/header-attrs.js","geo-datasets-experiment-selection-and-initial-processing_files/header-attrs-2.9/header-attrs.js","geo-datasets-experiment-selection-and-initial-processing_files/jquery-1.11.3/jquery.min.js","geo-datasets-experiment-selection-and-initial-processing_files/kePrint-0.0.1/kePrint.js","geo-datasets-experiment-selection-and-initial-processing_files/lightable-0.0.1/lightable.css","geo-datasets-experiment-selection-and-initial-processing_files/popper-2.6.0/popper.min.js","geo-datasets-experiment-selection-and-initial-processing_files/tippy-6.2.7/tippy-bundle.umd.min.js","geo-datasets-experiment-selection-and-initial-processing_files/tippy-6.2.7/tippy-light-border.css","geo-datasets-experiment-selection-and-initial-processing_files/tippy-6.2.7/tippy.css","geo-datasets-experiment-selection-and-initial-processing_files/tippy-6.2.7/tippy.umd.min.js","geo-datasets-experiment-selection-and-initial-processing_files/webcomponents-2.0.0/webcomponents.js","geo.gif","geometadb_er.png"]}
+  {"type":"character","attributes":{},"value":["biblio.bib","data/GEOmetadb.sqlite","data/GSE152641_Inflammatix_COVID19_counts_entrez.csv.gz","geo-datasets-experiment-selection-and-initial-processing_files/anchor-4.2.2/anchor.min.js","geo-datasets-experiment-selection-and-initial-processing_files/bowser-1.9.3/bowser.min.js","geo-datasets-experiment-selection-and-initial-processing_files/distill-2.2.21/template.v2.js","geo-datasets-experiment-selection-and-initial-processing_files/figure-html5/boxplot-1.png","geo-datasets-experiment-selection-and-initial-processing_files/figure-html5/density-1.png","geo-datasets-experiment-selection-and-initial-processing_files/figure-html5/unnamed-chunk-32-1.png","geo-datasets-experiment-selection-and-initial-processing_files/figure-html5/unnamed-chunk-33-1.png","geo-datasets-experiment-selection-and-initial-processing_files/figure-html5/unnamed-chunk-34-1.png","geo-datasets-experiment-selection-and-initial-processing_files/figure-html5/unnamed-chunk-35-1.png","geo-datasets-experiment-selection-and-initial-processing_files/header-attrs-2.8.6/header-attrs.js","geo-datasets-experiment-selection-and-initial-processing_files/header-attrs-2.9/header-attrs.js","geo-datasets-experiment-selection-and-initial-processing_files/jquery-1.11.3/jquery.min.js","geo-datasets-experiment-selection-and-initial-processing_files/kePrint-0.0.1/kePrint.js","geo-datasets-experiment-selection-and-initial-processing_files/lightable-0.0.1/lightable.css","geo-datasets-experiment-selection-and-initial-processing_files/popper-2.6.0/popper.min.js","geo-datasets-experiment-selection-and-initial-processing_files/tippy-6.2.7/tippy-bundle.umd.min.js","geo-datasets-experiment-selection-and-initial-processing_files/tippy-6.2.7/tippy-light-border.css","geo-datasets-experiment-selection-and-initial-processing_files/tippy-6.2.7/tippy.css","geo-datasets-experiment-selection-and-initial-processing_files/tippy-6.2.7/tippy.umd.min.js","geo-datasets-experiment-selection-and-initial-processing_files/webcomponents-2.0.0/webcomponents.js","geo.gif","geometadb_er.png"]}
   </script>
   <!--radix_placeholder_navigation_in_header-->
   <!--/radix_placeholder_navigation_in_header-->
@@ -3769,7 +3769,7 @@ IMX_sample00086
 </div>
 </div>
 <h4 id="defining-group">Defining group</h4>
-<p>This is an experiment with <strong><em>a simple design</em></strong>: a simple comparison between two sample groups: COVID-19 and HC.<span class="citation" data-cites="GSE152641">(<a href="#ref-GSE152641" role="doc-biblioref">Thair et al. 2021</a>)</span><br />
+<p>This is an experiment with <strong><em>a simple design</em></strong>: a simple comparison between two sample groups: COVID-19 and healthy control.<span class="citation" data-cites="GSE152641">(<a href="#ref-GSE152641" role="doc-biblioref">Thair et al. 2021</a>)</span><br />
 </p>
 <p>For most experiments in the GEO database, groups to which samples belong are usually indicated in samples’ titles. This means we are able to define groups for samples using regex to check their titles, which are the column names of the count matrix.<br />
 </p>
@@ -4813,6 +4813,7 @@ Healthy control
 <blockquote>
 <p>“it is recommended to remove features without at least 1 read per million in n of the samples, where n is the size of the smallest group of replicates”</p>
 </blockquote>
+<p>The reason is that a gene must be expressed at some minimal level before it can be translated into a protein. This means genes with very low counts across all libraries provide little evidence for differential expression.</p>
 <p>Since we have only two groups: 24 healthy human controls and 62 COVID-19 patients, 24 is the size is the smallest group of biological replicates here:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
@@ -4821,6 +4822,16 @@ Healthy control
 </code></pre>
 </div>
 </div>
+<p>Or alternatively, by the Bioconductor edgeR user guide:</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>keep</span> <span class='op'>&lt;-</span> <span class='fu'>edgeR</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/edgeR/man/filterByExpr.html'>filterByExpr</a></span><span class='op'>(</span><span class='va'>cpms</span>, group <span class='op'>=</span> <span class='va'>samples</span><span class='op'>$</span><span class='va'>group</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<p>It comes down users’ preferences for whichever method to use; they produce the same result.<br />
+</p>
+<p>And we only keep genes that meet the threshold of at least 1 read per million in 24 of the samples:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='va'>counts</span> <span class='op'>&lt;-</span> <span class='va'>counts</span><span class='op'>[</span><span class='va'>keep</span>, <span class='op'>]</span>
@@ -5980,7 +5991,7 @@ Show code
 </code></pre>
 </div>
 </details>
-<p><img src="geo-datasets-experiment-selection-and-initial-processing_files/figure-html5/unnamed-chunk-32-1.png" width="624" /></p>
+<p><img src="geo-datasets-experiment-selection-and-initial-processing_files/figure-html5/unnamed-chunk-33-1.png" width="624" /></p>
 </div>
 <p>Dispersion is a parameter of a negative binomial model that describes how much variance deviates from the mean, while the BCV is the square root of the dispersion parameter under the negative binomial model.</p>
 <p>The BCV plot presents the estimated relative variability of expression between biological replicates; it illustrates the association between the biological CV and the average true gene abundance.</p>
@@ -6007,7 +6018,7 @@ Show code
 </code></pre>
 </div>
 </details>
-<p><img src="geo-datasets-experiment-selection-and-initial-processing_files/figure-html5/unnamed-chunk-33-1.png" width="624" /></p>
+<p><img src="geo-datasets-experiment-selection-and-initial-processing_files/figure-html5/unnamed-chunk-34-1.png" width="624" /></p>
 </div>
 <p>The mean-variance plot presents the modelling of the mean-variance relationship for the normalised expression values, which are split into bins by overall expression level in the model. The grey points represent the pooled gene-wise variances. The blue points on the mean-variance plot represent the estimated gene-wise variances. The red crosses represent the pooled gene-wise variances, while the dark red crosses represent the the average of the pooled variances for each bin of genes plotted against the average expression level of the genes in the bin. The blue line shows the mean-variance relationship for a negative binomial model with common dispersion.<span class="citation" data-cites="edgeR1">(<a href="#ref-edgeR1" role="doc-biblioref">Mark D. Robinson, McCarthy, and Smyth 2009</a>)</span><span class="citation" data-cites="edgeR2">(<a href="#ref-edgeR2" role="doc-biblioref">McCarthy, Chen, and Smyth 2012a</a>)</span> We observe that all types of variances fit well along the negative binomial line.</p>
 <h3 id="sample-relations">Sample relations</h3>
@@ -6020,20 +6031,22 @@ Show code
 <pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>edgeR</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/edgeR/man/plotMDS.DGEList.html'>plotMDS.DGEList</a></span><span class='op'>(</span>
     <span class='va'>d</span>,
     col      <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"#b7371d"</span>, <span class='st'>"#51af84"</span><span class='op'>)</span><span class='op'>[</span><span class='fu'><a href='https://rdrr.io/r/base/factor.html'>factor</a></span><span class='op'>(</span><span class='va'>samples</span><span class='op'>$</span><span class='va'>group</span><span class='op'>)</span><span class='op'>]</span>,
+    main     <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste</a></span><span class='op'>(</span><span class='st'>"Variation between Samples in Expression Level"</span><span class='op'>)</span>,
+    cex.main <span class='op'>=</span> <span class='fl'>1</span>,
+    cex      <span class='op'>=</span> <span class='fl'>0.5</span>,
     cex.axis <span class='op'>=</span> <span class='fl'>0.75</span>,
-    cex.lab  <span class='op'>=</span> <span class='fl'>0.75</span>,
-    main     <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste</a></span><span class='op'>(</span><span class='st'>"Variation between Samples in Expression Level"</span><span class='op'>)</span>
+    cex.lab  <span class='op'>=</span> <span class='fl'>0.75</span>
     <span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/graphics/legend.html'>legend</a></span><span class='op'>(</span><span class='st'>"topleft"</span>,
        lwd      <span class='op'>=</span> <span class='fl'>2</span>,
        text.col <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"#51af84"</span>,<span class='st'>"#b7371d"</span><span class='op'>)</span>,
        legend   <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Healthy control"</span>, <span class='st'>"COVID19"</span><span class='op'>)</span>,
        lty      <span class='op'>=</span> <span class='fl'>0</span>,
-       cex      <span class='op'>=</span> <span class='fl'>0.75</span><span class='op'>)</span>
+       cex      <span class='op'>=</span> <span class='fl'>0.5</span><span class='op'>)</span>
 </code></pre>
 </div>
 </details>
-<p><img src="geo-datasets-experiment-selection-and-initial-processing_files/figure-html5/unnamed-chunk-34-1.png" width="624" /></p>
+<p><img src="geo-datasets-experiment-selection-and-initial-processing_files/figure-html5/unnamed-chunk-35-1.png" width="624" /></p>
 </div>
 <p>The MDS plot presents variation among samples based on the normalised gene expression. The distances between each pair of samples on the MDS plot suggest how different these samples are in terms of log fold changes of the expression levels of the filtered genes. The healthy control and the COVID-19 patient samples form separate clusters along the plot in the leading logFC dimension 1.</p>
 <h2 id="to-do">To Do</h2>

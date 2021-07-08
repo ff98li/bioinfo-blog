@@ -17,6 +17,7 @@ categories:
     - bioconductor
     - bioinformatics
 preview: biomart.png
+draft: TRUE
 ---
 
 
@@ -35,7 +36,8 @@ compare the results of mapping by these databases, and
 choose the mapping that has the best coverage.
 Note that we are not mapping HGNC symbols for all 20460 genes,
 but for the remaining 14426 genes
-after filtering genes with very low counts across all libraries.
+after filtering genes with low counts in
+[the normalisation procedure](https://www.ffli.dev/posts/2021-07-05-geo-datasets-experiment-selection-and-initial-processing/#tmm-normalisation).
 
 ## biomaRt
 
