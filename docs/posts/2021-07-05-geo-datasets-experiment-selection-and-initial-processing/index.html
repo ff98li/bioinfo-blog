@@ -140,7 +140,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <!--/radix_placeholder_rmarkdown_metadata-->
   
   <script type="text/json" id="radix-resource-manifest">
-  {"type":"character","attributes":{},"value":["biblio.bib","data/GEOmetadb.sqlite","data/GSE152641_Inflammatix_COVID19_counts_entrez.csv.gz","geo-datasets-experiment-selection-and-initial-processing_files/anchor-4.2.2/anchor.min.js","geo-datasets-experiment-selection-and-initial-processing_files/bowser-1.9.3/bowser.min.js","geo-datasets-experiment-selection-and-initial-processing_files/distill-2.2.21/template.v2.js","geo-datasets-experiment-selection-and-initial-processing_files/figure-html5/boxplot-1.png","geo-datasets-experiment-selection-and-initial-processing_files/figure-html5/density-1.png","geo-datasets-experiment-selection-and-initial-processing_files/figure-html5/unnamed-chunk-32-1.png","geo-datasets-experiment-selection-and-initial-processing_files/figure-html5/unnamed-chunk-33-1.png","geo-datasets-experiment-selection-and-initial-processing_files/figure-html5/unnamed-chunk-34-1.png","geo-datasets-experiment-selection-and-initial-processing_files/figure-html5/unnamed-chunk-35-1.png","geo-datasets-experiment-selection-and-initial-processing_files/header-attrs-2.8.6/header-attrs.js","geo-datasets-experiment-selection-and-initial-processing_files/header-attrs-2.9/header-attrs.js","geo-datasets-experiment-selection-and-initial-processing_files/jquery-1.11.3/jquery.min.js","geo-datasets-experiment-selection-and-initial-processing_files/kePrint-0.0.1/kePrint.js","geo-datasets-experiment-selection-and-initial-processing_files/lightable-0.0.1/lightable.css","geo-datasets-experiment-selection-and-initial-processing_files/popper-2.6.0/popper.min.js","geo-datasets-experiment-selection-and-initial-processing_files/tippy-6.2.7/tippy-bundle.umd.min.js","geo-datasets-experiment-selection-and-initial-processing_files/tippy-6.2.7/tippy-light-border.css","geo-datasets-experiment-selection-and-initial-processing_files/tippy-6.2.7/tippy.css","geo-datasets-experiment-selection-and-initial-processing_files/tippy-6.2.7/tippy.umd.min.js","geo-datasets-experiment-selection-and-initial-processing_files/webcomponents-2.0.0/webcomponents.js","geo.gif","geometadb_er.png"]}
+  {"type":"character","attributes":{},"value":["biblio.bib","data/GEOmetadb.sqlite","data/GSE152641_Inflammatix_COVID19_counts_entrez.csv.gz","data/normalised_counts.rds","geo-datasets-experiment-selection-and-initial-processing_files/anchor-4.2.2/anchor.min.js","geo-datasets-experiment-selection-and-initial-processing_files/bowser-1.9.3/bowser.min.js","geo-datasets-experiment-selection-and-initial-processing_files/distill-2.2.21/template.v2.js","geo-datasets-experiment-selection-and-initial-processing_files/figure-html5/boxplot-1.png","geo-datasets-experiment-selection-and-initial-processing_files/figure-html5/density-1.png","geo-datasets-experiment-selection-and-initial-processing_files/figure-html5/unnamed-chunk-32-1.png","geo-datasets-experiment-selection-and-initial-processing_files/figure-html5/unnamed-chunk-33-1.png","geo-datasets-experiment-selection-and-initial-processing_files/figure-html5/unnamed-chunk-34-1.png","geo-datasets-experiment-selection-and-initial-processing_files/figure-html5/unnamed-chunk-35-1.png","geo-datasets-experiment-selection-and-initial-processing_files/figure-html5/unnamed-chunk-36-1.png","geo-datasets-experiment-selection-and-initial-processing_files/header-attrs-2.8.6/header-attrs.js","geo-datasets-experiment-selection-and-initial-processing_files/header-attrs-2.9/header-attrs.js","geo-datasets-experiment-selection-and-initial-processing_files/jquery-1.11.3/jquery.min.js","geo-datasets-experiment-selection-and-initial-processing_files/kePrint-0.0.1/kePrint.js","geo-datasets-experiment-selection-and-initial-processing_files/lightable-0.0.1/lightable.css","geo-datasets-experiment-selection-and-initial-processing_files/popper-2.6.0/popper.min.js","geo-datasets-experiment-selection-and-initial-processing_files/tippy-6.2.7/tippy-bundle.umd.min.js","geo-datasets-experiment-selection-and-initial-processing_files/tippy-6.2.7/tippy-light-border.css","geo-datasets-experiment-selection-and-initial-processing_files/tippy-6.2.7/tippy.css","geo-datasets-experiment-selection-and-initial-processing_files/tippy-6.2.7/tippy.umd.min.js","geo-datasets-experiment-selection-and-initial-processing_files/webcomponents-2.0.0/webcomponents.js","geo.gif","geometadb_er.png"]}
   </script>
   <!--radix_placeholder_navigation_in_header-->
 <meta name="distill:offset" content="../.."/>
@@ -3295,7 +3295,7 @@ GSE154244
 </div>
 <p>Always read the publication of the original experiment and understand the experiment before starting the analysis.</p>
 <h3 id="overview-of-the-chosen-experiment">Overview of the chosen experiment</h3>
-<p>The original study of <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE152641">GSE152641</a><span class="citation" data-cites="GSE152641">(<a href="#ref-GSE152641" role="doc-biblioref">Thair et al. 2021</a>)</span> performed expression analysis on genes of these 86 samples and compiled expression data of prior studies on six viruses: influenza, RSV, HRV, Ebola, Dengue, and SARS in an attempt to isolate COVID-19 biomarkers from other viral infections. The RNA-seq data was generated by profiling peripheral blood from <strong>62 COVID-19 patients</strong> and <strong>24 healthy controls</strong> via bulk RNA-seq. The RNA-seq count matrix in the data file consists of <strong>20460 unique Entrez gene ID’s</strong> along the rows and 86 samples (biological replicates) along the columns.</p>
+<p>The original study of <a href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE152641">GSE152641</a><span class="citation" data-cites="GSE152641">(<a href="#ref-GSE152641" role="doc-biblioref">Thair et al. 2021</a>)</span> performed expression analysis on genes of these 86 samples and compiled expression data of prior studies on six viruses: influenza, RSV, HRV, Ebola, Dengue, and SARS in an attempt to isolate COVID-19 biomarkers from other viral infections. The RNA-seq data was generated by profiling peripheral blood from <strong>62 COVID-19 patients</strong> and <strong>24 healthy controls</strong> via bulk RNA-seq. The RNA-seq count matrix in the data file consists of <strong>20460 unique Entrez gene IDs</strong> along the rows and 86 samples (biological replicates) along the columns.</p>
 <h3 id="downloading-dataset">Downloading Dataset</h3>
 <p><code>GEOquery</code> provides easy and quick methods for accessing data from GEO <span class="citation" data-cites="GEOquery">(<a href="#ref-GEOquery" role="doc-biblioref">Davis and Meltzer 2007</a>)</span>:</p>
 <div class="layout-chunk" data-layout="l-body">
@@ -4939,10 +4939,10 @@ IMX_sample00086
 </table>
 </div>
 </div>
-<p>Note that the name for the column of gene ID’s is blank. Label the column to avoid confusion:</p>
+<p>Note that the name for the column of gene IDs is blank. Label the column to avoid confusion:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>covid19_exp</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span> <span class='op'>&lt;-</span> <span class='st'>"entrezgene_id"</span> <span class='co'>## genes were labeled w/ Entrez ID's</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/base/colnames.html'>colnames</a></span><span class='op'>(</span><span class='va'>covid19_exp</span><span class='op'>)</span><span class='op'>[</span><span class='fl'>1</span><span class='op'>]</span> <span class='op'>&lt;-</span> <span class='st'>"entrezgene_id"</span> <span class='co'>## genes were labeled w/ Entrez IDs</span>
 </code></pre>
 </div>
 </div>
@@ -5979,7 +5979,7 @@ Healthy control
 </div>
 </div>
 <h4 id="normalising-counts">Normalising counts</h4>
-<p>Create a numeric matrix of the read counts with the gene ID’s as row names:</p>
+<p>Create a numeric matrix of the read counts with the gene IDs as row names:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='va'>counts</span>           <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>as.matrix</a></span><span class='op'>(</span><span class='va'>covid19_exp</span><span class='op'>[</span><span class='fl'>2</span><span class='op'>:</span><span class='fl'>87</span><span class='op'>]</span><span class='op'>)</span>
@@ -6039,6 +6039,14 @@ Healthy control
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='va'>normalised_counts</span> <span class='op'>&lt;-</span> <span class='fu'>edgeR</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/edgeR/man/cpm.html'>cpm</a></span><span class='op'>(</span><span class='va'>d</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<p>And save the normalised count matrix as an R object for later analyses:</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>saveRDS</a></span><span class='op'>(</span>object <span class='op'>=</span> <span class='va'>normalised_counts</span>,
+        file   <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='st'>"."</span>, <span class='st'>"data"</span>, <span class='st'>"normalised_counts.rds"</span><span class='op'>)</span><span class='op'>)</span>
 </code></pre>
 </div>
 </div>
@@ -7169,7 +7177,7 @@ Show code
 </code></pre>
 </div>
 </details>
-<p><img src="geo-datasets-experiment-selection-and-initial-processing_files/figure-html5/unnamed-chunk-33-1.png" width="624" /></p>
+<p><img src="geo-datasets-experiment-selection-and-initial-processing_files/figure-html5/unnamed-chunk-34-1.png" width="624" /></p>
 </div>
 <p>Dispersion is a parameter of a negative binomial model that describes how much variance deviates from the mean, while the BCV is the square root of the dispersion parameter under the negative binomial model.</p>
 <p>The BCV plot presents the estimated relative variability of expression between biological replicates; it illustrates the association between the biological CV and the average true gene abundance.</p>
@@ -7196,7 +7204,7 @@ Show code
 </code></pre>
 </div>
 </details>
-<p><img src="geo-datasets-experiment-selection-and-initial-processing_files/figure-html5/unnamed-chunk-34-1.png" width="624" /></p>
+<p><img src="geo-datasets-experiment-selection-and-initial-processing_files/figure-html5/unnamed-chunk-35-1.png" width="624" /></p>
 </div>
 <p>The mean-variance plot presents the modelling of the mean-variance relationship for the normalised expression values, which are split into bins by overall expression level in the model. The grey points represent the pooled gene-wise variances. The blue points on the mean-variance plot represent the estimated gene-wise variances. The red crosses represent the pooled gene-wise variances, while the dark red crosses represent the the average of the pooled variances for each bin of genes plotted against the average expression level of the genes in the bin. The blue line shows the mean-variance relationship for a negative binomial model with common dispersion.<span class="citation" data-cites="edgeR1">(<a href="#ref-edgeR1" role="doc-biblioref">Mark D. Robinson, McCarthy, and Smyth 2009</a>)</span><span class="citation" data-cites="edgeR2">(<a href="#ref-edgeR2" role="doc-biblioref">McCarthy, Chen, and Smyth 2012a</a>)</span> We observe that all types of variances fit well along the negative binomial line.</p>
 <h3 id="sample-relations">Sample relations</h3>
@@ -7224,11 +7232,11 @@ Show code
 </code></pre>
 </div>
 </details>
-<p><img src="geo-datasets-experiment-selection-and-initial-processing_files/figure-html5/unnamed-chunk-35-1.png" width="624" /></p>
+<p><img src="geo-datasets-experiment-selection-and-initial-processing_files/figure-html5/unnamed-chunk-36-1.png" width="624" /></p>
 </div>
 <p>The MDS plot presents variation among samples based on the normalised gene expression. The distances between each pair of samples on the MDS plot suggest how different these samples are in terms of log fold changes of the expression levels of the filtered genes. The healthy control and the COVID-19 patient samples form separate clusters along the plot in the leading logFC dimension 1.</p>
 <h2 id="to-do">To Do</h2>
-<p>As the genes in this dataset were labeled with Entrez gene ID’s, before performing any further analyses with the processed RNA-seq data, we need to map them to their HGNC names, which are how genes are referred in most annotation datasets and literatures, and more meaningful than simply numerical ID’s. This step is supposed to be part of the initial processing; however, mappings produced by different databases vary in quality. I will compare the mapping results produced by 3 different databases and finish converting gene ID’s in a later post.</p>
+<p>As the genes in this dataset were labeled with Entrez gene IDs, before performing any further analyses with the processed RNA-seq data, we need to map them to their HGNC names, which are how genes are referred in most annotation datasets and literatures, and more meaningful than simply numerical IDs. This step is supposed to be part of the initial processing; however, mappings produced by different databases vary in quality. I will compare the mapping results produced by 3 different databases and finish converting gene IDs in a later post.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
 <div id="ref-DE_protocol" class="csl-entry" role="doc-biblioentry">

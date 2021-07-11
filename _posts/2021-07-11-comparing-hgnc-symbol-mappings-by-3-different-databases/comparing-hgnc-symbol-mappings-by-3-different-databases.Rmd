@@ -1,0 +1,883 @@
+---
+title: "Comparing HGNC Symbol Mappings by 3 Different Databases"
+description: |
+    Mapping from Entrez gene IDs to HGNC gene symbols for genes in GSE152641 using biomaRt, BridgeDbR, and org.Hs.eg.db.
+author:
+    - name: Feifei Li
+      url: {}
+date: 2021-07-11
+bibliography: biblio.bib
+output:
+    distill::distill_article:
+        self_contained: FALSE
+        toc: TRUE
+creative_commons: CC BY
+categories:
+    - R
+    - bioconductor
+    - bioinformatics
+preview: biomart.png
+---
+
+
+```{r setup, include=FALSE}
+library(kableExtra)
+knitr::opts_chunk$set(warning = FALSE,
+                      message = FALSE)
+```
+
+This post is a continuation of
+[the initial processing of GSE152641 RNA-seq data](https://www.ffli.dev/posts/2021-07-05-geo-datasets-experiment-selection-and-initial-processing/).
+The aim is to map the identifiers of genes in GSE152641
+from Entrez gene IDs to the corresponding HGNC gene names
+using three different databases,
+compare the results of mapping by these databases, and
+choose the mapping that has the best coverage.
+Note that we are not mapping HGNC symbols for all 20460 genes,
+but for the remaining 14426 genes
+after filtering genes with low counts in
+[the normalisation procedure](https://www.ffli.dev/posts/2021-07-05-geo-datasets-experiment-selection-and-initial-processing/#tmm-normalisation).\
+
+To load the normalised count matrix and get the Entrez gene IDs:
+
+```{r}
+normalised_counts <- readRDS(file = "./data/normalised_counts.rds")
+entrezID          <- rownames(normalised_counts)
+```
+
+## biomaRt
+
+[<code>biomaRt</code>](10.18129/B9.bioc.biomaRt) is perhaps the most popular
+choice for mapping gene identifiers in R.
+It provides an R interface that executes direct SQL queries to
+[the BioMart databases](http://www.biomart.org/notice.html).[@biomart1]
+
+```{r}
+## install biomaRt via bioconductor
+if (!requireNamespace("biomaRt", quietly = TRUE))
+    BiocManager::install("biomaRt")
+```
+
+### Mart Database
+
+To see mart databases that can be accessed through the biomaRt interface:
+
+```{r, eval = FALSE}
+biomaRt::listMarts()
+```
+
+```{r, echo = FALSE}
+kbl(biomaRt::listMarts()) %>%
+    kable_paper()
+```
+
+Note that by default it only lists mart databases hosted by Ensembl,
+as the <code>host</code> argument by default is set to
+<code>www.ensembl.org</code>.
+To see mart databases available on other hosts,
+users need to supply the <code>host</code> argument.
+For example, the Phytozome mart database hosted by JGI:
+
+```{r, eval = FALSE}
+biomaRt::listMarts(host = "https://phytozome.jgi.doe.gov")
+```
+
+```{r, echo = FALSE}
+kbl(biomaRt::listMarts(host = "https://phytozome.jgi.doe.gov")) %>%
+    kable_paper()
+```
+
+
+For Ensembl's mart databases, according to the
+[tutorial page](https://m.ensembl.org/info/data/biomart/how_to_use_biomart.html)
+for Ensembl's web-based BioMart query tool,
+
+* Ensembl Genes
+    + contains the Ensembl gene set
+    + allows users to retrieve:
+        + Ensembl genes, transcripts, proteins as well as external references, microarrays, protein domains, structure, sequences, variants (only variants mapped to Ensembl Transcripts) and homology data
+* Ensembl Variation
+    + allows users to retrieve germline and somatic variants as well as germline and somatic structural variants
+    + contains variants' phenotypes, citations, synomyms, consequences and flanking sequences
+    + retrieve Ensembl genes, transcripts, regulatory and motif features mapped to variants
+* Ensembl Regulation
+    + allows users to retrieve regulatory features, evidence and segments, miRNA target regions, binding motifs and other regulatory regions
+* Mouse strains
+    + No ideas what this mart is. Looked it up on Google but nothing turned up.
+
+Note that the VEGA mart mentioned in the tutorial has been archived and no longer available in biomaRt after
+[release 67](http://vega.archive.ensembl.org/info/website/news.html?id=68&submit=Go#news_1222). For those who would like to access the archived VEGA mart database:
+
+```{r, eval = FALSE}
+biomaRt::useEnsembl(biomart = "vega", version = 67)
+```
+
+Just FYI.\
+
+
+For mapping gene identifiers, we only need Ensembl Genes:
+
+```{r}
+ensembl <- biomaRt::useMart("ENSEMBL_MART_ENSEMBL")
+```
+
+To see datasets available in the chosen mart:
+
+```{r, eval = FALSE}
+biomaRt::listDatasets(ensembl)
+```
+
+```{r, echo = FALSE}
+kbl(biomaRt::listDatasets(ensembl)) %>%
+    kable_paper() %>%
+    scroll_box(width = "100%", height = "200px")
+```
+
+Since we are mapping human genes,
+we filter datasets with the keyword "sapiens":
+
+```{r, eval = FALSE}
+datasets <- biomaRt::listDatasets(ensembl)
+datasets <- datasets[grep(datasets$dataset, pattern = "sapiens"),]
+```
+
+Or alternatively, use the built-in biomaRt wrapper to filter datasets:
+
+```{r}
+datasets <- biomaRt::searchDatasets(mart = ensembl, pattern = "sapiens")
+```
+
+```{r, echo = FALSE}
+kbl(datasets) %>% kable_paper()
+```
+
+And we found the dataset we need to use for mapping. To use this dataset:
+
+```{r}
+# Choose the dataset for Homo sapiens
+ensembl <- biomaRt::useDataset(mart    = ensembl,
+                               dataset = "hsapiens_gene_ensembl")
+```
+
+
+### biomaRt Query
+
+A biomaRt query consists of **filters**, **values**, and **attributes**,
+which define restrictions on the query.
+Specifically, values are the actual information to query about,
+which in our case is the Entrez gene IDs in GSE152641,
+while filters define the scope of query, e.g. Entrez gene ID in this case.
+For filters available in the chosen dataset of an Ensembl mart:
+
+```{r, eval=FALSE}
+biomaRt::listFilters(mart = ensembl)
+```
+
+```{r, echo = FALSE}
+kbl(biomaRt::listFilters(mart = ensembl)) %>%
+    kable_paper() %>%
+    row_spec(row        = which(biomaRt::listFilters(ensembl)$name == "entrezgene_id"),
+             bold       = T,
+             color      = "white",
+             background = "#D7261E") %>%
+    scroll_box(width = "100%", height = "300px")
+```
+
+Note that <code>listFilters</code> must be used with a mart object
+in which a dataset has been defined.\
+Since we are mapping from Entrez ID, we choose filter <code>entrezgene_id</code>.\
+
+Attributes define the types of data we want in the query result.
+To see attributes available for the chosen dataset:
+
+```{r, eval=FALSE}
+biomaRt::listAttributes(mart = ensembl)
+```
+
+```{r, echo = FALSE}
+kbl(biomaRt::listAttributes(mart = ensembl)) %>%
+    kable_paper() %>%
+    row_spec(row        = which(
+        biomaRt::listAttributes(ensembl)$name %in% c("entrezgene_id",
+                                                     "hgnc_symbol")
+        ),
+             bold       = T,
+             color      = "white",
+             background = "#D7261E") %>%
+    scroll_box(width = "100%", height = "300px")
+```
+
+Since we want to create a mapping from Entrez gene IDs to HGNC symbols,
+we choose <code>entrezgene_id</code> and <code>hgnc_symbol</code>
+for the attributes of our biomart query.
+Knowing values, filters, and attributes,
+we are now able to build a biomaRt query and execute it using
+biomaRt's primary query function:
+
+```{r, results = 'hide'}
+entrez2Hgnc_biomaRt <- biomaRt::getBM(
+    mart       = ensembl,
+    attributes = c("entrezgene_id", "hgnc_symbol"),  ## Entrez ID to HGNC symbol
+    filters    = "entrezgene_id",       ## filter by the Entrez IDs in the data
+    values     = entrezID
+    )
+```
+
+Now we have a mapping
+from Entrez gene IDs to HGNC symbols for the genes in GSE152641:
+
+```{r}
+names(entrez2Hgnc_biomaRt)
+```
+
+
+### Result
+
+Assessing the quality of the mapping is always needed,
+as there could be genes that cannot be mapped by the database,
+resulting in missing values:
+
+```{r}
+nrow(entrez2Hgnc_biomaRt)
+nrow(normalised_counts)
+```
+
+Or duplicates...\
+
+To check how many genes biomaRt failed to map:
+
+```{r}
+# Remove rows that have no HGNC symbols mapped to Entrez IDs
+entrez2Hgnc_biomaRt <- entrez2Hgnc_biomaRt[
+    entrez2Hgnc_biomaRt$hgnc_symbol != "", ]
+
+# Check how many Entrez IDs remain unmapped
+if (nrow(entrez2Hgnc_biomaRt) != length(entrezID)) {
+    miss <- (length(entrezID) - nrow(entrez2Hgnc_biomaRt))
+    sprintf("%i Entrez IDs not mapped to HGNC symbols.", miss)
+}
+```
+
+How come that so many genes were not mapped?
+The reason is that biomaRt first maps Entrez IDs to Ensembl IDs,
+and then to HGNC symbols. However,
+there doesn't really exist a simple 1-to-1 mapping from Entrez IDs to Ensembl IDs. Hence we are not getting a full translation of the Entrez IDs.\
+
+This means we would have to manually check the HGNC symbols for the 83 genes.
+This is ~~lame~~ time-consuming and inefficient.
+We turn to another database and see if we can get a better mapping.
+
+## BridgeDbR
+
+<code>BridgeDbR</code>[@BridgeDbR] is an R interface to the BridgeDb framework,
+which provides a standard interface layer through which
+bioinformatics tools can be connected to different identifier mapping services
+such as Ensembl BioMart and PICR.
+The BridgeDb framework combines multiple mapping services to get broader coverage.
+[@BridgeDb]
+
+This means we can expect a better mapping by BridgeDbR than biomaRt.
+
+```{r}
+## install BridgeDbR from Bioconductor
+if (!requireNamespace("BridgeDbR", quietly = TRUE))
+    BiocManager::install("BridgeDbR", ask = FALSE)
+```
+
+### Database
+
+BridgeDb provides its own ready-to-go mapping services in the form of local relational databases.
+These database files are created per species for genes and proteins.
+BridgeDb identifies organisms by their latin name and with a two character code.
+[@BridgeDb]
+
+To get the name of the database file for human gene,
+we first need to figure out the organism code for homo sapiens:
+
+```{r}
+## converts an organism latin name into a code.
+BridgeDbR::getOrganismCode(name = "Homo sapiens")
+```
+
+The name of the Bridge database file:
+
+```{r}
+(dbname <- BridgeDbR::getBridgeNames(code = "Hs"))
+```
+
+Then to download the Bridge database file:
+
+```{r}
+## file path to Bridge database
+dbLocation <- file.path(".", "data", dbname)
+## download only if it hasn't been downloaded
+if (!file.exists(dbLocation)) {
+    dbLocation <- BridgeDbR::getDatabase(organism = "Homo sapiens",
+                                         location = file.path(".", "data"))
+}
+```
+
+
+### Mapping identifiers
+
+To load the downloaded Bridge database:
+
+```{r}
+mapper <- BridgeDbR::loadDatabase(dbLocation)
+```
+
+BridgeDbR's mapping function requires the identifiers that are to be converted
+to be stored in a data frame with 2 specific columns named
+<code>source</code> and <code>identifier</code>,
+where <code>source</code> indicates the data source of gene identifiers it maps from.
+Each such data source is also identified by a human readable long name
+and by a short system code.\
+
+[Full list of BridgeDb system codes](https://bridgedb.github.io/pages/system-codes.html)\
+
+For Entrez gene IDs, the system code is <code>L</code>.
+
+To create a such data frame:
+
+```{r}
+input <- data.frame(
+    source    = rep("L", length(entrezID)),
+    identifer = as.character(entrezID)
+)
+```
+
+The mapping function also requires an argument that specifies a data source
+for the target identifiers it maps to. For HGNC symbol it will be <code>H</code>
+
+```{r, eval=FALSE}
+entrez2Hgnc_bridge <- BridgeDbR::maps(
+    mapper      = mapper,
+    identifiers = input,
+    target      = "H"
+    )
+```
+
+And it throws an error:
+
+<pre>
+Error in map(mapper, source = source, identifier = identifier, target = target) :
+java.lang.NoSuchMethodError: &lt;init&gt; 
+</pre>
+
+Oddly, this worked back in February.
+I tried to fix this problem myself but couldn't even identify the cause of this.
+I've submitted this in
+[the BridgeDbR GitHub tracker](https://github.com/bridgedb/BridgeDbR/issues/19).
+
+### Result
+
+I will update the result as soon as the issue above is resolved.
+
+
+## OrgDb
+
+OrgDb is a class of gene-centric <code>AnnotationDbi</code> packages
+at the organism level that contains annotation data for the genes of an organism.
+Specifically, the one we will use for mapping:
+
+```{r}
+if (!requireNamespace("org.Hs.eg.db", quietly = TRUE))
+    BiocManager::install("org.Hs.eg.db", ask = FALSE)
+```
+
+This package contains genome wide annotation for Human,
+primarily based on mapping using Entrez Gene identifiers.[@org]\
+
+Many Bioconductor packages for annotation support OrgDb, and
+<code>AnnotationDbi</code>[@annotationdbi] is most commonly used:
+
+```{r}
+# Use org.Hs.eg.db database to map identifiers
+if (!requireNamespace("AnnotationDbi", quietly = TRUE))
+    BiocManager::install("AnnotationDbi", ask = FALSE)
+```
+
+
+### org.Hs.eg.db
+
+Unlike other packages, which we can use their functions without loading them,
+annotation packages need to be loaded first:
+
+```{r}
+suppressPackageStartupMessages({
+    library(org.Hs.eg.db)
+})
+```
+
+Types of annotation data retriveable from <code>org.Hs.eg.db</code>:
+
+```{r}
+AnnotationDbi::columns(org.Hs.eg.db)
+```
+
+Or **fields** that can be used as keys to query the database:
+
+```{r}
+AnnotationDbi::keytypes(org.Hs.eg.db)
+```
+
+It's not always the case that an annotation package has the same
+keytypes as its types of annotations; 
+some annotation data can't be used as keys for querying.\
+
+The fields we're interested in are <code>ENTREZID</code> and <code>SYMBOL</code>.
+
+
+### Mapping
+
+Querying an OrgDb annotation package with <code>AnnotationDbi</code>
+to create a mapping is much simpler and straightforward:
+
+```{r, message = TRUE}
+cols <- c(
+    "ENTREZID", ## from
+    "SYMBOL"    ## to
+    )           ## types of data we want in the query result
+entrez2Hgnc_OrgDb <- AnnotationDbi::select(org.Hs.eg.db,
+                                           keys    = entrezID,
+                                           keytype = "ENTREZID",
+                                           columns = cols)
+```
+
+
+### Result
+
+First we check whether there are missing values in the mapping:
+
+```{r}
+# Remove rows that have no HGNC symbols mapped to Entrez IDs
+entrez2Hgnc_OrgDb <- entrez2Hgnc_OrgDb[entrez2Hgnc_OrgDb$SYMBOL != "", ]
+entrez2Hgnc_OrgDb <- entrez2Hgnc_OrgDb[!is.na(entrez2Hgnc_OrgDb$SYMBOL), ]
+
+# Check how many Entrez IDs remain unmapped
+if (nrow(entrez2Hgnc_OrgDb) != length(entrezID)) {
+    miss <- (length(entrezID) - nrow(entrez2Hgnc_OrgDb))
+    sprintf("%i Entrez IDs not mapped to HGNC symbols.", miss)
+} else {
+    sprintf("No missing values.")
+}
+```
+
+Then we look for duplicates in the mapping,
+since if there are duplicates,
+then there will be Entrez gene IDs mepped more than once:
+
+```{r}
+hgnc_occur <- as.data.frame(table(entrez2Hgnc_OrgDb$SYMBOL))
+hgnc_occur[hgnc_occur$Freq > 1, ]
+```
+
+So there are no gene IDs repetitively mapped.
+This means we have only 13 genes to check.
+This is much more manageable than 83 genes.
+
+## Manual Clean-up
+
+Since there were only two mappings available by BioMart and OrgDb
+at the time of writing,
+we will use the mapping by OrgDb as it has the least missing values
+and manually check those missing values by hands.
+After all, some due diligence is required:)
+
+### Enterz gene IDs missing HGNC symbols
+
+The Entrez gene IDs that couldn't be mapped to HGNC symbols by OrgDb
+are the following:
+
+```{r}
+entrezID[!(entrezID %in% entrez2Hgnc_OrgDb$ENTREZID)]
+```
+
+One might retrieve their information by using
+the Entrez Programming Utilities,
+but now the fastest way to know what happened to these genes is
+directly look them up in [NCBI Gene](https://www.ncbi.nlm.nih.gov/gene/).
+
+| Entrez Gene ID                                                 | HGNC Symbol  | Current Status                                                                                            |
+|----------------------------------------------------------------|--------------|-----------------------------------------------------------------------------------------------------------|
+| [23285](https://www.ncbi.nlm.nih.gov/gene/23285)               | KIAA1107     | replaced with GeneID: [284697](https://www.ncbi.nlm.nih.gov/gene/284697). HGNC symbol: BTBD8              |
+| [84953](https://www.ncbi.nlm.nih.gov/gene/?term=84953)         | MICALCL      | replaced with Gene ID: [9645](https://www.ncbi.nlm.nih.gov/gene/9645). HGNC symbol: MICAL2                |
+| [285464](https://www.ncbi.nlm.nih.gov/gene/?term=285464)       | CRIPAK       | has been withdrawn by NCBI. It was decided that this locus is not an independent gene.                    |
+| [338809](https://www.ncbi.nlm.nih.gov/gene/?term=338809)       | C12orf74     | replaced with Gene ID: [440107](https://www.ncbi.nlm.nih.gov/gene/440107). HGNC symbol: PLEKHG7           |
+| [388289](https://www.ncbi.nlm.nih.gov/gene/?term=388289)       | C16orf47     | replaced with Gene ID: [463](https://www.ncbi.nlm.nih.gov/gene/463). HGNC symbol: ZFHX3                   |
+| [723788](https://www.ncbi.nlm.nih.gov/gene/?term=723788)       | MIG7         | replaced with Gene ID: [8412](https://www.ncbi.nlm.nih.gov/gene/8412). HGNC symbol: BCAR3                 |
+| [102724957](https://www.ncbi.nlm.nih.gov/gene/?term=102724957) | LOC102724957 | replaced with Gene ID: [105376569](https://www.ncbi.nlm.nih.gov/gene/105376569). HGNC symbol: LINC02751   |
+| [102724985](https://www.ncbi.nlm.nih.gov/gene/?term=102724985) | LOC102724985 | has been withdrawn by NCBI staff. This record represented a gene that is not currently annotated by NCBI. |
+| [102724993](https://www.ncbi.nlm.nih.gov/gene/?term=102724993) | LOC102724993 | replaced with Gene ID: [642799](https://www.ncbi.nlm.nih.gov/gene/642799). HGNC symbol: NPIPA2            |
+| [107983991](https://www.ncbi.nlm.nih.gov/gene/?term=107983991) | LOC107983991 | replaced with Gene ID: [105372267](https://www.ncbi.nlm.nih.gov/gene/105372267). HGNC symbol: NFILZ       |
+| [107984125](https://www.ncbi.nlm.nih.gov/gene/?term=107984125) | LOC107984125 | replaced with Gene ID: [6101](https://www.ncbi.nlm.nih.gov/gene/6101). HGNC symbol: RP1                   |
+| [107984138](https://www.ncbi.nlm.nih.gov/gene/?term=107984138) | LOC107984138 | replaced with Gene ID: [100506060](https://www.ncbi.nlm.nih.gov/gene/100506060). HGNC symbol: SMG1P7      |
+| [107986084](https://www.ncbi.nlm.nih.gov/gene/?term=107986084) | LOC107986084 |  replaced with Gene ID: [7375](https://www.ncbi.nlm.nih.gov/gene/7375). HGNC symbol: USP4                 |
+
+
+Then we check whether the Entrez gene IDs missing HGNC symbols and
+the IDs they were replaced with have the same counts for every biological replicate.
+If they have identical gene counts,
+then we treat the unmapped gene ID as a duplicate record and remove it.
+
+#### 23285
+
+```{r, eval=FALSE}
+normalised_counts[rownames(normalised_counts) == "23285",] ==
+    normalised_counts[rownames(normalised_counts) == "284697",]
+```
+
+```{r, echo=FALSE}
+temp <- normalised_counts[rownames(normalised_counts) == "23285",] ==
+  normalised_counts[rownames(normalised_counts) == "284697",]
+kbl(temp) %>%
+    kable_paper() %>%
+    scroll_box(width = "500px", height = "200px")
+```
+
+Check whether the mapped HGNC symbol of the replacing Entrez gene ID matches
+the NCBI gene record:
+
+```{r}
+entrez2Hgnc_OrgDb[entrez2Hgnc_OrgDb$ENTREZID == "284697",]
+```
+
+
+#### 84953
+
+```{r, eval=FALSE}
+normalised_counts[rownames(normalised_counts) == "84953",] ==
+    normalised_counts[rownames(normalised_counts) == "9645",]
+```
+
+```{r, echo=FALSE}
+temp <- normalised_counts[rownames(normalised_counts) == "84953",] ==
+  normalised_counts[rownames(normalised_counts) == "9645",]
+kbl(temp) %>%
+    kable_paper() %>%
+    scroll_box(width = "500px", height = "200px")
+```
+
+Check whether the mapped HGNC symbol of the replacing Entrez gene ID matches
+the NCBI gene record:
+
+```{r}
+entrez2Hgnc_OrgDb[entrez2Hgnc_OrgDb$ENTREZID == "9645",]
+```
+
+
+#### 338809
+
+```{r, eval=FALSE}
+normalised_counts[rownames(normalised_counts) == "338809",] ==
+    normalised_counts[rownames(normalised_counts) == "440107",]
+```
+
+```{r, echo=FALSE}
+temp <- normalised_counts[rownames(normalised_counts) == "338809",] ==
+    normalised_counts[rownames(normalised_counts) == "440107",]
+kbl(temp) %>%
+    kable_paper() %>%
+    scroll_box(width = "500px", height = "200px")
+```
+
+Check whether the mapped HGNC symbol of the replacing Entrez gene ID matches
+the NCBI gene record:
+
+```{r}
+entrez2Hgnc_OrgDb[entrez2Hgnc_OrgDb$ENTREZID == "440107",]
+```
+
+
+#### 388289
+
+```{r, eval=FALSE}
+normalised_counts[rownames(normalised_counts) == "388289",] ==
+    normalised_counts[rownames(normalised_counts) == "463",]
+```
+
+```{r, echo=FALSE}
+temp <- normalised_counts[rownames(normalised_counts) == "388289",] ==
+  normalised_counts[rownames(normalised_counts) == "463",]
+kbl(temp) %>%
+      kable_paper() %>%
+    scroll_box(width = "500px", height = "200px")
+```
+
+Check whether the mapped HGNC symbol of the replacing Entrez gene ID matches
+the NCBI gene record:
+
+```{r}
+entrez2Hgnc_OrgDb[entrez2Hgnc_OrgDb$ENTREZID == "463",]
+```
+
+
+#### 723788
+
+```{r, eval=FALSE}
+normalised_counts[rownames(normalised_counts) == "723788",] ==
+    normalised_counts[rownames(normalised_counts) == "8412",]
+```
+
+```{r, echo=FALSE}
+temp <- normalised_counts[rownames(normalised_counts) == "723788",] ==
+    normalised_counts[rownames(normalised_counts) == "8412",]
+kbl(temp) %>%
+      kable_paper() %>%
+    scroll_box(width = "500px", height = "200px")
+```
+
+Check whether the mapped HGNC symbol of the replacing Entrez gene ID matches
+the NCBI gene record:
+
+```{r}
+entrez2Hgnc_OrgDb[entrez2Hgnc_OrgDb$ENTREZID == "8412",]
+```
+
+#### 102724957
+
+```{r, eval=FALSE}
+normalised_counts[rownames(normalised_counts) == "102724957",] ==
+    normalised_counts[rownames(normalised_counts) == "105376569",]
+```
+
+```{r, echo=FALSE}
+temp <- normalised_counts[rownames(normalised_counts) == "102724957",] ==
+  normalised_counts[rownames(normalised_counts) == "105376569",]
+kbl(temp) %>%
+    kable_paper() %>%
+    scroll_box(width = "500px", height = "200px")
+```
+
+Their records are no identical.
+This means we still need to treat it as an independent gene.
+
+```{r}
+entrez2Hgnc_OrgDb <- rbind(entrez2Hgnc_OrgDb,
+                           data.frame(
+                               ENTREZID = "102724957",
+                               SYMBOL   = "LOC102724957"
+                               )
+                           )
+```
+
+#### 102724993
+
+```{r, eval=FALSE}
+normalised_counts[rownames(normalised_counts) == "102724993",] ==
+    normalised_counts[rownames(normalised_counts) == "642799",]
+```
+
+```{r, echo=FALSE}
+temp <- normalised_counts[rownames(normalised_counts) == "102724993",] ==
+  normalised_counts[rownames(normalised_counts) == "642799",]
+kbl(temp) %>%
+    kable_paper() %>%
+    scroll_box(width = "500px", height = "200px")
+```
+
+No results returned.
+This means the replacing Entrez ID 642799 is not present in the dataset.
+In this case we map it to the HGNC symbol of the replacing gene ID:
+
+```{r}
+entrez2Hgnc_OrgDb <- rbind(entrez2Hgnc_OrgDb,
+                           data.frame(
+                               ENTREZID = "102724993",
+                               SYMBOL   = "NPIPA2"
+                               )
+                           )
+```
+
+#### 107983991
+
+```{r, eval=FALSE}
+normalised_counts[rownames(normalised_counts) == "107983991",] ==
+    normalised_counts[rownames(normalised_counts) == "105372267",]
+```
+
+```{r, echo=FALSE}
+temp <- normalised_counts[rownames(normalised_counts) == "107983991",] ==
+  normalised_counts[rownames(normalised_counts) == "105372267",]
+kbl(temp) %>%
+    kable_paper() %>%
+    scroll_box(width = "500px", height = "200px")
+```
+
+Check whether the mapped HGNC symbol of the replacing Entrez gene ID matches
+the NCBI gene record:
+
+```{r}
+entrez2Hgnc_OrgDb[entrez2Hgnc_OrgDb$ENTREZID == "105372267",]
+```
+
+
+#### 107984125
+
+```{r, eval=FALSE}
+normalised_counts[rownames(normalised_counts) == "107984125",] ==
+    normalised_counts[rownames(normalised_counts) == "6101",]
+```
+
+```{r, echo=FALSE}
+temp <- normalised_counts[rownames(normalised_counts) == "107984125",] ==
+  normalised_counts[rownames(normalised_counts) == "6101",]
+kbl(temp) %>%
+    kable_paper() %>%
+    scroll_box(width = "500px", height = "200px")
+```
+
+Check whether the mapped HGNC symbol of the replacing Entrez gene ID matches
+the NCBI gene record:
+
+```{r}
+entrez2Hgnc_OrgDb[entrez2Hgnc_OrgDb$ENTREZID == "6101",]
+```
+
+#### 107984138
+
+```{r, eval=FALSE}
+normalised_counts[rownames(normalised_counts) == "107984138",] ==
+    normalised_counts[rownames(normalised_counts) == "100506060",]
+```
+
+```{r, echo=FALSE}
+temp <- normalised_counts[rownames(normalised_counts) == "107984125",] ==
+  normalised_counts[rownames(normalised_counts) == "100506060",]
+kbl(temp) %>%
+    kable_paper() %>%
+    scroll_box(width = "500px", height = "200px")
+```
+
+This one also returns no record.
+We treat the same as the way we did to 102724993:
+
+```{r}
+entrez2Hgnc_OrgDb <- rbind(entrez2Hgnc_OrgDb,
+                           data.frame(
+                               ENTREZID = "107984138",
+                               SYMBOL   = "SMG1P7"
+                               )
+                           )
+```
+
+#### 107986084
+
+```{r, eval=FALSE}
+normalised_counts[rownames(normalised_counts) == "107986084",] ==
+    normalised_counts[rownames(normalised_counts) == "7375",]
+```
+
+```{r, echo=FALSE}
+temp <- normalised_counts[rownames(normalised_counts) == "107986084",] ==
+  normalised_counts[rownames(normalised_counts) == "7375",]
+kbl(temp) %>%
+    kable_paper() %>%
+    scroll_box(width = "500px", height = "200px")
+```
+
+Check whether the mapped HGNC symbol of the replacing Entrez gene ID matches
+the NCBI gene record:
+
+```{r}
+entrez2Hgnc_OrgDb[entrez2Hgnc_OrgDb$ENTREZID == "7375",]
+```
+
+And we manually map the gene IDs withdrawn by NCBI:
+
+```{r}
+withdrawnID <- data.frame(
+    ENTREZID = c("285464", "102724985"),
+    SYMBOL   = c("CRIPAK", "LOC102724985")
+)
+entrez2Hgnc_OrgDb <- rbind(entrez2Hgnc_OrgDb, withdrawnID)
+```
+
+For now, we disregard the fact that these gene IDs were withdrawn by NCBI staff
+as they were still used by the original experiment.
+
+### Replcaing Entrez ID in the Count Matrix
+
+Create a named vector from the data frame with the mapping.
+
+```{r}
+entrez2Hgnc <- setNames(as.character(entrez2Hgnc_OrgDb$SYMBOL),
+                        nm = entrez2Hgnc_OrgDb$ENTREZID)
+```
+
+We will use it as a dictionary object in Python for mapping:\
+
+```{r}
+## Select genes that have their Entrez IDs mapped to HGNC symbols
+select <- which(rownames(normalised_counts) %in% names(entrez2Hgnc))
+## ID conversion
+rownames(normalised_counts)[select] <- entrez2Hgnc[
+    rownames(normalised_counts)[select]
+    ]
+```
+
+Finally, take out the genes considered to be duplicates from the count matrix:
+
+```{r}
+## Since we didn't put them in the mapping
+dup_gene          <- setdiff(entrezID, entrez2Hgnc_OrgDb$ENTREZID)
+## Select rows to delete
+select            <- which(rownames(normalised_counts) %in% dup_gene)
+normalised_counts <- normalised_counts[-select, ]
+```
+
+We have mapped every Entrez gene IDs in the count matrix to their HGNC symbols.
+This concludes the initial processing of the bulk RNA-seq count data of GSE152641:
+
+```{r}
+saveRDS(object = normalised_counts,
+        file   = file.path(".", "data", "normalised_counts.rds"))
+```
+
+
+## Conclusion
+
+When mapping gene identifiers,
+it is always important to assess the quality of mappings
+produced by different databases.
+In this post, the quality of these mappings were only assessed
+based on the number of gene identifiers mapped.
+One thing we haven't checked in the mappings is
+whether there are genes mismatched to wrong HGNC symbols.
+Yes, this could happen.
+For example,
+gene <code>100913187</code> in this dataset is being incorrectly mapped by biomaRt:
+
+```{r}
+biomaRt::getBM(
+    mart       = ensembl,
+    attributes = c("entrezgene_id", "hgnc_symbol"),  ## Entrez ID to HGNC symbol
+    filters    = "entrezgene_id",       ## filter by the Entrez IDs in the data
+    values     = "100913187"
+    )
+```
+
+And the query result returned by OrgDb:
+
+```{r}
+AnnotationDbi::select(org.Hs.eg.db,
+                      keys    = "100913187",
+                      keytype = "ENTREZID",
+                      columns = cols)
+```
+
+If we look it up in [NCBI gene](https://www.ncbi.nlm.nih.gov/gene/100913187),
+<code>APOBEC3A_B</code> is the right HGNC symbol.
+The Entrez gene ID for <code>APOBEC3A</code> is
+[<code>200315</code>](https://www.ncbi.nlm.nih.gov/gene/200315).\
+
+As shown above,
+in the case of mapping from Entrez gene IDs to HGNC symbols,
+OrgDb might be preferable to biomaRt.
+
+## To Do
+
+I will update the result of mapping by BridgeDbR as soon as
+the problem is fixed.
+Differential expression analysis will be performed on this count matrix.
+
