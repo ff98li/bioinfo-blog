@@ -366,7 +366,7 @@ java.lang.NoSuchMethodError: &lt;init&gt;
 
 Oddly, this worked back in February.
 I tried to fix this problem myself but couldn't even identify the cause of this.
-I've submitted this in
+I've submitted this issue in
 [the BridgeDbR GitHub tracker](https://github.com/bridgedb/BridgeDbR/issues/19).
 
 ### Result
