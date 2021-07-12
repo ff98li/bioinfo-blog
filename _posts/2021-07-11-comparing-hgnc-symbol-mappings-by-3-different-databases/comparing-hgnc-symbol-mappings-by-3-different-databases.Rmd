@@ -750,7 +750,7 @@ kbl(temp) %>%
 ```
 
 This one also returns no record.
-We treat the same as the way we did to 102724993:
+We treat it the same as the way we did to 102724993:
 
 ```{r}
 entrez2Hgnc_OrgDb <- rbind(entrez2Hgnc_OrgDb,

@@ -1,6 +1,6 @@
 ----------------------------------------------------------------
-2021-07-12 03:31:03.288 GMT:
- Booting Derby version The Apache Software Foundation - Apache Derby - 10.5.3.0 - (802917): instance a816c00e-017a-98c4-a8cb-00000de18358
+2021-07-12 05:16:48.030 GMT:
+ Booting Derby version The Apache Software Foundation - Apache Derby - 10.5.3.0 - (802917): instance a816c00e-017a-9925-78c5-00000de53350
 on database directory jar:(E:\GitHub\blog\_posts\2021-07-11-comparing-hgnc-symbol-mappings-by-3-different-databases\data\Hs_Derby_Ensembl_91.bridge)database in READ ONLY mode 
 
 Database Class Loader started - derby.database.classpath=''
