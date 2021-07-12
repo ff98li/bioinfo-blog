@@ -469,7 +469,7 @@ then there will be Entrez gene IDs mepped more than once:
 
 ```{r}
 hgnc_occur <- as.data.frame(table(entrez2Hgnc_OrgDb$SYMBOL))
-hgnc_occur[hgnc_occur$Freq > 1, ]
+nrow(hgnc_occur[hgnc_occur$Freq > 1, ])
 ```
 
 So there are no gene IDs repetitively mapped.

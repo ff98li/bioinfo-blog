@@ -43835,11 +43835,10 @@ java.lang.NoSuchMethodError: &lt;init&gt;
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='va'>hgnc_occur</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.data.frame.html'>as.data.frame</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/table.html'>table</a></span><span class='op'>(</span><span class='va'>entrez2Hgnc_OrgDb</span><span class='op'>$</span><span class='va'>SYMBOL</span><span class='op'>)</span><span class='op'>)</span>
-<span class='va'>hgnc_occur</span><span class='op'>[</span><span class='va'>hgnc_occur</span><span class='op'>$</span><span class='va'>Freq</span> <span class='op'>&gt;</span> <span class='fl'>1</span>, <span class='op'>]</span>
+<span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>nrow</a></span><span class='op'>(</span><span class='va'>hgnc_occur</span><span class='op'>[</span><span class='va'>hgnc_occur</span><span class='op'>$</span><span class='va'>Freq</span> <span class='op'>&gt;</span> <span class='fl'>1</span>, <span class='op'>]</span><span class='op'>)</span>
 </code></pre>
 </div>
-<pre><code>[1] Var1 Freq
-&lt;0 行&gt; (或0-长度的row.names)</code></pre>
+<pre><code>[1] 0</code></pre>
 </div>
 <p>So there are no gene IDs repetitively mapped. This means we have only 13 genes to check. This is much more manageable than 83 genes.</p>
 <h2 id="manual-clean-up">Manual Clean-up</h2>
