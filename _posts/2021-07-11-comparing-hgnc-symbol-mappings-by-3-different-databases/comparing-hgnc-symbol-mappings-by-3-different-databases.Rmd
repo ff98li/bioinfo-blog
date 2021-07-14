@@ -518,7 +518,7 @@ directly look them up in [NCBI Gene](https://www.ncbi.nlm.nih.gov/gene/).
 Then we check whether the Entrez gene IDs missing HGNC symbols and
 the IDs they were replaced with have the same counts for every biological replicate.
 If they have identical gene counts,
-then we treat the unmapped gene ID as a duplicate record and remove it.
+then we treat the unmapped gene ID as a duplicate and remove it.
 
 #### 23285
 
@@ -649,7 +649,7 @@ kbl(temp) %>%
     scroll_box(width = "500px", height = "200px")
 ```
 
-Their records are no identical.
+Their expression values are no identical.
 This means we still need to treat it as an independent gene.
 
 ```{r}
@@ -749,7 +749,7 @@ kbl(temp) %>%
     scroll_box(width = "500px", height = "200px")
 ```
 
-This one also returns no record.
+This one also returns no values.
 We treat it the same as the way we did to 102724993:
 
 ```{r}

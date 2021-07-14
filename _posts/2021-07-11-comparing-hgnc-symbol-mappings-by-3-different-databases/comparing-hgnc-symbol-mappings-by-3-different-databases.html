@@ -42756,7 +42756,7 @@ java.lang.NoSuchMethodError: &lt;init&gt;
 </tr>
 </tbody>
 </table>
-<p>Then we check whether the Entrez gene IDs missing HGNC symbols and the IDs they were replaced with have the same counts for every biological replicate. If they have identical gene counts, then we treat the unmapped gene ID as a duplicate record and remove it.</p>
+<p>Then we check whether the Entrez gene IDs missing HGNC symbols and the IDs they were replaced with have the same counts for every biological replicate. If they have identical gene counts, then we treat the unmapped gene ID as a duplicate and remove it.</p>
 <h4 id="section">23285</h4>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
@@ -47080,7 +47080,7 @@ FALSE
 </table>
 </div>
 </div>
-<p>Their records are no identical. This means we still need to treat it as an independent gene.</p>
+<p>Their expression values are no identical. This means we still need to treat it as an independent gene.</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='va'>entrez2Hgnc_OrgDb</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>rbind</a></span><span class='op'>(</span><span class='va'>entrez2Hgnc_OrgDb</span>,
@@ -49108,7 +49108,7 @@ IMX_sample00086
 </table>
 </div>
 </div>
-<p>This one also returns no record. We treat it the same as the way we did to 102724993:</p>
+<p>This one also returns no values. We treat it the same as the way we did to 102724993:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='va'>entrez2Hgnc_OrgDb</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/cbind.html'>rbind</a></span><span class='op'>(</span><span class='va'>entrez2Hgnc_OrgDb</span>,

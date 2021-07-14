@@ -1,7 +1,8 @@
 ---
-title: "Differential Gene Expression Analysis: edgeR vs limma"
+title: "Differential Expression Analysis: edgeR vs limma"
 description: |
-    A short description of the post.
+    Perform differential gene expression analysis
+    and visualise differentially expressed genes in R
 author:
     - name: Feifei Li
       url: {}
@@ -20,11 +21,11 @@ draft: TRUE
 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(warning = FALSE,
+                      message = FALSE)
 ```
 
-Distill is a publication format for scientific and technical writing, native to the web.
-
-Learn more about using Distill at <https://rstudio.github.io/distill>.
 
 
+
+## Visualising Expression Level
