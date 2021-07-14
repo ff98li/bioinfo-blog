@@ -373,7 +373,7 @@ GEOquery::Meta(gsm[[1]])[c(2, 31)]
 
 Knowing these two pieces of information for each sample of the experiment,
 we are now able to define groups for the samples in R.
-The most R-ish way I've come up with so far without using for-loop:
+The most R-ish way I've come up with so far without using a for-loop:
 
 ```{r}
 samples <- lapply(gsm,
@@ -648,7 +648,9 @@ edgeR::plotBCV(d, col.tagwise = "black", col.common = "red",
                main = "Common and Tag-wise Dispersion vs Expression Levels")
 ```
 
-Dispersion is a parameter of a negative binomial model that describes how much variance deviates from the mean, while the BCV is the square root of the dispersion
+edgeR models gene counts with the negative binomial distribution,
+which assumes the variance of gene counts depends on two dispersion parameters,
+one of which is the negative binomial dispersion, which describes how much variance deviates from the mean, and the BCV is the square root of this dispersion
 parameter under the negative binomial model.
 
 The BCV plot presents the estimated relative variability of expression between biological replicates; it illustrates the association between the biological CV and the average true gene abundance.
@@ -712,4 +714,4 @@ and more meaningful than simply numerical IDs.
 This step is supposed to be part of the initial processing;
 however, mappings produced by different databases vary in quality.
 I will compare the mapping results produced by 3 different databases and
-finish converting gene IDs in a later post. 
+finish converting gene IDs in a later post.

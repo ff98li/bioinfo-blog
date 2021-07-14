@@ -3806,7 +3806,7 @@ IMX_sample00086
 $title
 [1] &quot;IMX_sample00001&quot;</code></pre>
 </div>
-<p>Knowing these two pieces of information for each sample of the experiment, we are now able to define groups for the samples in R. The most R-ish way I’ve come up with so far without using for-loop:</p>
+<p>Knowing these two pieces of information for each sample of the experiment, we are now able to define groups for the samples in R. The most R-ish way I’ve come up with so far without using a for-loop:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='va'>samples</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>lapply</a></span><span class='op'>(</span><span class='va'>gsm</span>,
@@ -6001,7 +6001,7 @@ Show code
 </details>
 <p><img src="geo-datasets-experiment-selection-and-initial-processing_files/figure-html5/unnamed-chunk-34-1.png" width="624" /></p>
 </div>
-<p>Dispersion is a parameter of a negative binomial model that describes how much variance deviates from the mean, while the BCV is the square root of the dispersion parameter under the negative binomial model.</p>
+<p>edgeR models gene counts with the negative binomial distribution, which assumes the variance of gene counts depends on two dispersion parameters, one of which is the negative binomial dispersion, which describes how much variance deviates from the mean, and the BCV is the square root of this dispersion parameter under the negative binomial model.</p>
 <p>The BCV plot presents the estimated relative variability of expression between biological replicates; it illustrates the association between the biological CV and the average true gene abundance.</p>
 <p>The common dispersion line suggests all gene expression values vary by close to a BCV value of 0.5 among replicates.<span class="citation" data-cites="bcv">(<a href="#ref-bcv" role="doc-biblioref">McCarthy, Chen, and Smyth 2012b</a>)</span> The tag-wise dispersion shows BCV values calculated individually for each gene. We observe that genes with higher true abundance (under the assumption that RNA-seq counts follow a negative binomial distribution) have lower BCV’s than genes with lower abundance. This implies that the higher the true expression level of a gene has, the lower its variation in our samples.</p>
 <h3 id="mean-variance-relationship">Mean-variance relationship</h3>

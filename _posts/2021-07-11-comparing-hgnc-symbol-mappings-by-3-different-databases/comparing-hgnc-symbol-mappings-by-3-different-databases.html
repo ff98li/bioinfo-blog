@@ -115,6 +115,8 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   <meta name="citation_reference" content="citation_title=BridgeDbR;citation_publication_date=2017;citation_publisher=Bioconductor;citation_doi=10.18129/B9.BIOC.BRIDGEDBR;citation_author=BridgeDbR"/>
   <meta name="citation_reference" content="citation_title=The BridgeDb framework: Standardized access to gene, protein and metabolite identifier mapping services;citation_publication_date=2010;citation_volume=11;citation_doi=10.1186/1471-2105-11-5;citation_author=Martijn Van Iersel;citation_author=Alexander Pico;citation_author=Thomas Kelder;citation_author=Jianjiong Gao;citation_author=Isaac Ho;citation_author=Kristina Hanspers;citation_author=Bruce Conklin;citation_author=Chris Evelo"/>
   <meta name="citation_reference" content="citation_title=AnnotationDbi;citation_publication_date=2017;citation_publisher=Bioconductor;citation_doi=10.18129/B9.BIOC.ANNOTATIONDBI;citation_author=Marc Carlson Herv茅 Pag猫s"/>
+  <meta name="citation_reference" content="citation_title=Correction: Corrigendum: An apoptosis-enhancing drug overcomes platinum resistance in a tumour-initiating subpopulation of ovarian cancer;citation_publication_date=2016;citation_volume=7;citation_doi=10.1038/ncomms10703;citation_issn=2041-1723;citation_author=D. M. Janzen;citation_author=E. Tiourin;citation_author=J. A. Salehi;citation_author=D. Y. Paik;citation_author=J. Lu;citation_author=M. Pellegrini;citation_author=S. Memarzadeh"/>
+  <meta name="citation_reference" content="citation_title=RETRACTED ARTICLE: An apoptosis-enhancing drug overcomes platinum resistance in a tumour-initiating subpopulation of ovarian cancer;citation_publication_date=2015;citation_publisher=Nature Publishing Group;citation_volume=6;citation_author=DM Janzen;citation_author=E Tiourin;citation_author=JA Salehi;citation_author=DY Paik;citation_author=J Lu;citation_author=M Pellegrini;citation_author=S Memarzadeh"/>
   <!--radix_placeholder_rmarkdown_metadata-->
 
   <script type="text/json" id="radix-rmarkdown-metadata">
@@ -49894,7 +49896,7 @@ TRUE
 </div>
 </div>
 <h2 id="conclusion">Conclusion</h2>
-<p>When mapping gene identifiers, it is always important to assess the quality of mappings produced by different databases. In this post, the quality of these mappings were only assessed based on the number of gene identifiers mapped. One thing we haven’t checked in the mappings is whether there are genes mismatched to wrong HGNC symbols. Yes, this could happen. For example, gene <code>100913187</code> in this dataset is being incorrectly mapped by biomaRt:</p>
+<p>When mapping gene identifiers, it is always important to assess the quality of mappings produced by different databases. As shown above, in the case of mapping from Entrez gene IDs to HGNC symbols, OrgDb might be preferable to biomaRt. Here the quality of these mappings were only assessed based on the number of gene identifiers mapped. One thing we haven’t checked in the mappings is whether there are genes mismatched to wrong HGNC symbols. Yes, this could happen. For example, gene <code>100913187</code> in this dataset is being incorrectly mapped by biomaRt:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>biomaRt</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/biomaRt/man/getBM.html'>getBM</a></span><span class='op'>(</span>
@@ -49922,7 +49924,7 @@ TRUE
 </div>
 <p>If we look it up in <a href="https://www.ncbi.nlm.nih.gov/gene/100913187">NCBI gene</a>, <code>APOBEC3A_B</code> is the right HGNC symbol. The Entrez gene ID for <code>APOBEC3A</code> is <a href="https://www.ncbi.nlm.nih.gov/gene/200315"><code>200315</code></a>.<br />
 </p>
-<p>As shown above, in the case of mapping from Entrez gene IDs to HGNC symbols, OrgDb might be preferable to biomaRt.</p>
+<p>Incorrect mappings of gene identifiers can result in significant impacts on downstream analyses. Differential gene expression analysis of a study on the efficacy of the co-therapy of birinapant and platinum-based carboplatin against platinum resistance in CA125-negative high-grade serous cancer (HGSC) cells showed significant difference in expression of DNA repair and apoptosis genes between therapy-resistant CA125-negative and differentiated CA125 positive chemotherapy-naïve human HGSC cells. <span class="citation" data-cites="janzen2015retracted">(<a href="#ref-janzen2015retracted" role="doc-biblioref">D. Janzen et al. 2015</a>)</span> However, this finding of difference in expression of the genes was a result of 341056 of its 730620 expression values mapped to incorrect gene names. As this problem was fixed, none of these genes were shown to be significantly differentially expressed between the two groups.<span class="citation" data-cites="janzen2016">(<a href="#ref-janzen2016" role="doc-biblioref">D. M. Janzen et al. 2016</a>)</span></p>
 <h2 id="to-do">To Do</h2>
 <p>I will update the result of mapping by BridgeDbR as soon as the problem is fixed. Differential expression analysis will be performed on this count matrix.</p>
 <div class="sourceCode" id="cb23"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
@@ -49938,6 +49940,12 @@ Durinck, Steffen, Yves Moreau, Arek Kasprzyk, Sean Davis, Bart De Moor, Alvis Br
 </div>
 <div id="ref-annotationdbi" class="csl-entry" role="doc-biblioentry">
 Hervé Pagès, Marc Carlson. 2017. <span>“AnnotationDbi.”</span> Bioconductor. <a href="https://doi.org/10.18129/B9.BIOC.ANNOTATIONDBI">https://doi.org/10.18129/B9.BIOC.ANNOTATIONDBI</a>.
+</div>
+<div id="ref-janzen2016" class="csl-entry" role="doc-biblioentry">
+Janzen, D. M., E. Tiourin, J. A. Salehi, D. Y. Paik, J. Lu, M. Pellegrini, and S. Memarzadeh. 2016. <span>“Correction: Corrigendum: An Apoptosis-Enhancing Drug Overcomes Platinum Resistance in a Tumour-Initiating Subpopulation of Ovarian Cancer.”</span> <em>Nature Communications</em> 7 (1): 10703. <a href="https://doi.org/10.1038/ncomms10703">https://doi.org/10.1038/ncomms10703</a>.
+</div>
+<div id="ref-janzen2015retracted" class="csl-entry" role="doc-biblioentry">
+Janzen, DM, E Tiourin, JA Salehi, DY Paik, J Lu, M Pellegrini, and S Memarzadeh. 2015. <span>“RETRACTED ARTICLE: An Apoptosis-Enhancing Drug Overcomes Platinum Resistance in a Tumour-Initiating Subpopulation of Ovarian Cancer.”</span> <em>Nature Communications</em> 6 (1): 1–18.
 </div>
 <div id="ref-BridgeDb" class="csl-entry" role="doc-biblioentry">
 Van Iersel, Martijn, Alexander Pico, Thomas Kelder, Jianjiong Gao, Isaac Ho, Kristina Hanspers, Bruce Conklin, and Chris Evelo. 2010. <span>“The BridgeDb Framework: Standardized Access to Gene, Protein and Metabolite Identifier Mapping Services.”</span> <em>BMC Bioinformatics</em> 11 (January): 5. <a href="https://doi.org/10.1186/1471-2105-11-5">https://doi.org/10.1186/1471-2105-11-5</a>.

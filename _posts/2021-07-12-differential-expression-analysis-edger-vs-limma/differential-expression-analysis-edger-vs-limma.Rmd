@@ -1,0 +1,30 @@
+---
+title: "Differential Gene Expression Analysis: edgeR vs limma"
+description: |
+    A short description of the post.
+author:
+    - name: Feifei Li
+      url: {}
+date: 2021-07-12
+output:
+  distill::distill_article:
+        self_contained: FALSE
+        toc: TRUE
+creative_commons: CC BY
+categories:
+    - R
+    - bioconductor
+    - bioinformatics
+draft: TRUE
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+Distill is a publication format for scientific and technical writing, native to the web.
+
+Learn more about using Distill at <https://rstudio.github.io/distill>.
+
+

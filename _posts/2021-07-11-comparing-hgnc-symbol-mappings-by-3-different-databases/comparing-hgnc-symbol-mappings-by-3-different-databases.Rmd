@@ -840,7 +840,10 @@ saveRDS(object = normalised_counts,
 When mapping gene identifiers,
 it is always important to assess the quality of mappings
 produced by different databases.
-In this post, the quality of these mappings were only assessed
+As shown above,
+in the case of mapping from Entrez gene IDs to HGNC symbols,
+OrgDb might be preferable to biomaRt.
+Here the quality of these mappings were only assessed
 based on the number of gene identifiers mapped.
 One thing we haven't checked in the mappings is
 whether there are genes mismatched to wrong HGNC symbols.
@@ -871,9 +874,21 @@ If we look it up in [NCBI gene](https://www.ncbi.nlm.nih.gov/gene/100913187),
 The Entrez gene ID for <code>APOBEC3A</code> is
 [<code>200315</code>](https://www.ncbi.nlm.nih.gov/gene/200315).\
 
-As shown above,
-in the case of mapping from Entrez gene IDs to HGNC symbols,
-OrgDb might be preferable to biomaRt.
+Incorrect mappings of gene identifiers can result in significant impacts on
+downstream analyses.
+Differential gene expression analysis of a study on
+the efficacy of the co-therapy of birinapant and platinum-based carboplatin
+against platinum resistance in
+CA125-negative high-grade serous cancer (HGSC) cells showed
+significant difference in expression of DNA repair and apoptosis genes
+between therapy-resistant CA125-negative and
+differentiated CA125 positive chemotherapy-naïve human HGSC cells.
+[@janzen2015retracted]
+However, this finding of difference in expression of the genes was a result of
+341056 of its 730620 expression values mapped to incorrect gene names.
+As this problem was fixed,
+none of these genes were shown to be significantly differentially expressed
+between the two groups.[@janzen2016]
 
 ## To Do
 
