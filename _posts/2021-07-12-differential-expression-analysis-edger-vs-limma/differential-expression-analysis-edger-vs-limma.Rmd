@@ -37,6 +37,7 @@ To load the processed RNA-seq data:
 ```{r}
 normalised_counts <- readRDS(file = "./data/normalised_counts.rds")
 samples           <- readRDS(file = "./data/samples.rds")
+d                 <- readRDS(file = "./data/DGEList.rds")
 ```
 
 
@@ -126,7 +127,7 @@ plot(x        = xlim,
                       nrow(normalised_counts), "Genes",
                       "in", ncol(normalised_counts), "Samples"),
      cex.main = 0.95,
-     xlab     = "TMM normalised counts",
+     xlab     = "TMM normalised CPM",
      ylab     = "Frequency"
 )
 for (i in seq_along(gene_dist)){
@@ -253,12 +254,12 @@ ComplexHeatmap::Heatmap(
 Finally, putting everything above together,
 we can write a function to avoid duplicate code:
 
-```{r}
-plotHeatMap <- function(deg = integer(0),
+```{r, code_folding = TRUE}
+plotHeatMap <- function(deg   = integer(0),
                         m,
                         samples,
                         title = "",
-                        group_cols = c("orange", "blue")) {
+                        cols  = c("orange", "blue")) {
     # Purpose:
     #     Standardise values in the input count matrix to Z-scores, and
     #     generate a heatmap plot for gene expression with samples ordered
@@ -270,8 +271,8 @@ plotHeatMap <- function(deg = integer(0),
     #              A dataframe specifying to which group a sample belongs.
     #              Note that it only supports samples divided into 2 groups:
     #              control and experimental
-    #     title:   Title for the heatmap
-    #     group_cols:
+    #     title  : Title for the heatmap
+    #     cols   :
     #              Colours to annotate the heatmap by groups.
     #              Use preset colours if not supplied.
     # Value:
@@ -291,20 +292,19 @@ plotHeatMap <- function(deg = integer(0),
     }
     
     # Get group names of samples
-    groups <- unique(samples$group)
-    
-    # Sample order divided by group
+    groups      <- levels(factor(samples$group))
+    # Sample order by group
     group_order <- c(which(samples$group == groups[2]),
                      which(samples$group == groups[1]))
     
     # Annotate heatmap by groups
-    ha_cols <- group_cols
+    ha_cols        <- cols
     names(ha_cols) <- groups
     ha <- ComplexHeatmap::HeatmapAnnotation(
-        df  = data.frame(Group = samples$group[group_order]),
-        col = list(Group = ha_cols)
+        df  = data.frame(Sample = samples$group[group_order]),
+        col = list(Sample = ha_cols)
     )
-    # Generate a heatmap
+    # Create a heatmap object
     gene_heatmap <- ComplexHeatmap::Heatmap(
         matrix              = m[ , group_order],
         column_title        = title,
@@ -338,6 +338,59 @@ model_design <- model.matrix(~group, data = samples)
 ```
 
 
+Note that *samples* is a dataframe labeling samples with their groups:
+```{r}
+
+```
+
+
+
+
+### Multiple Hypothesis Testing for Differentially Expressed Genes by QLM
+
+We first use edgeR[@edgeR_1][@edgeR_2] to estimate the dispersion. Note that the object *d* is a DGEList previously created when normalising the count matrix (see the data processing script for details).
+
+```{r, warning=FALSE}
+d       <- edgeR::estimateDisp(d, model_design) # dispersion of normalised count
+fit_qlm <- edgeR::glmQLFit(d, model_design)
+```
+
+In this step, QL dispersion was estimated with edgeR[@edgeR_1][@edgeR_2] by fitting a QL negative binomial (NB) generalised log-linear model to the DGEList data containing the normalised counts and the estimated NB dispersions (visualised with the BCV and mean-variance plots), along with the design matrix we just created.
+
+
+We then use the fitted result to conduct genewise QL F-test for the coefficients of our defined sample groups.
+```{r}
+qlf_SARS2vsHC <- edgeR::glmQLFTest(fit_qlm, coef = colnames(model_design)[2])
+```
+This step calculates the p-values for each of the genes in our expression set.
+
+### QL F-test P-values Comparison: FDR-correcred vs Uncorrected
+Extract the top differentially expressed tags ranked by p-values from the result of the QL F-test and display the number of genes that passed the correction:
+```{r, echo=FALSE}
+qlf_output_hits <- edgeR::topTags(object         = qlf_SARS2vsHC,
+                                  sort.by        = "PValue",
+                                  n              = nrow(gene_counts_norm))
+knitr::kable(data.frame(
+    "Number of genes with p-value < 0.05"        = length(
+        which(
+            qlf_output_hits$table$PValue < 0.05
+            )
+        ),
+    "Number of genes that pass after correction" = length(
+        which(
+            qlf_output_hits$table$FDR < 0.05
+        )
+    ),
+    check.names                                  = F
+))
+```
+
+
+The threshold for showing statistically significant evidence for differential expression was set to $p < 0.05$ for each gene. We chose this threshold because we want to capture the genes that only have less 5% chance to show such differences in expression between groups if they were non-differentially expressed genes.
+
+
+Note that edgeR by default uses the false discovery rate (FDR/Benjamini-Hochberg) method to correct p-values for false positive results. This method was applied because we need to control for the the liklihood of false positive results that would increase by chance with the increasing number of tests performed.
+We also set the threshold for the corrected p-value (FDR) to be $<0.05$, because we want to capture genes that have false positive results for fewer than 5% of the significant tests.
 
 ### Volcano Plot
 
