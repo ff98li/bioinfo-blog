@@ -408,6 +408,12 @@ kbl(samples) %>%
     scroll_box(width = "100%", height = "200px")
 ```
 
+Save this data frame as an R object. We will need to use it later when
+performing differential gene expression analysis:
+
+```{r}
+saveRDS(object = samples, file = file.path(".", "data", "samples.rds"))
+```
 
 #### Normalising counts
 
@@ -440,7 +446,7 @@ Or alternatively, by the Bioconductor edgeR user guide:
 keep <- edgeR::filterByExpr(cpms, group = samples$group)
 ```
 
-It comes down users' preferences for whichever method to use;
+It ultimately comes down to users' preferences for whichever method to use;
 they produce the same result.\
 
 And we only keep genes that meet the threshold of at least 1 read per million in 24 of the samples:

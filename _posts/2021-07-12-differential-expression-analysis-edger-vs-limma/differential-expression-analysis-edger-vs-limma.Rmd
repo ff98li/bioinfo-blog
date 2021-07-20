@@ -1,7 +1,7 @@
 ---
 title: "Differential Expression Analysis: edgeR vs limma"
 description: |
-    Perform differential gene expression analysis
+    Perform differential expression analysis
     and visualise differentially expressed genes in R
 author:
     - name: Feifei Li
@@ -25,7 +25,403 @@ knitr::opts_chunk$set(warning = FALSE,
                       message = FALSE)
 ```
 
+The dataset being used here is [GSE152641](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE152641)[@GSE152641]
+Before differential expression analysis, we have done:
 
+* [Initial RNA-seq data processing](https://www.ffli.dev/posts/2021-07-05-geo-datasets-experiment-selection-and-initial-processing/)
+* [Mapping gene identifiers to HGNC gene names](https://www.ffli.dev/posts/2021-07-11-comparing-hgnc-symbol-mappings-by-3-different-databases/)
+
+
+To load the processed RNA-seq data:
+
+```{r}
+normalised_counts <- readRDS(file = "./data/normalised_counts.rds")
+samples           <- readRDS(file = "./data/samples.rds")
+```
 
 
 ## Visualising Expression Level
+
+We will be using [ComplexHeatmap](https://bioconductor.org/packages/release/bioc/html/ComplexHeatmap.html)[@complexheatmap] for heatmap visualisation of gene expression and [circlize](https://github.com/jokergoo/circlize)[@circlize] to generate a colour gredient indicating expression levels of the genes:
+
+```{r}
+if (!requireNamespace("circlize", quietly = TRUE))
+    install.packages("circlize")
+if (!requireNamespace("ComplexHeatmap", quietly = TRUE))
+    BiocManager::install("ComplexHeatmap")
+```
+
+We write a function to create a color palette using <code>circlize</code>:
+
+```{r}
+heatmap_cols <- function(mat, neg = "green", zero = "black", pos = "red") {
+    # Purpose:
+    #     Helper function to create a transition colour gradient for a heatmap
+    # Parameters:
+    #     mat: A RNA-seq count matrix
+    #     neg: colour for negative expression values, green by default
+    #     zero: colour for expression values of zero, black by default
+    #     pos: colour for positive expression values, red by default
+    # Value:
+    #     cols: a vector of colour gradient indicating expression level
+    
+    if (min(mat) == 0) { ## when the lowest expression value is 0
+        cols <- circlize::colorRamp2(c(min(mat), max(mat)),
+                                     c(zero, pos)
+                                     )
+    } else { ## when the lowest expression value is negative
+        cols <- circlize::colorRamp2(c(min(mat), 0, max(mat)),
+                                     c(neg, zero, pos)
+                                     )
+    }
+    
+    return(cols)
+}
+```
+
+One might ask, how could an expression value be negative? Before answering that,
+if we directly plot out the gene counts in a heatmap:
+
+```{r}
+ComplexHeatmap::Heatmap(
+    matrix              = normalised_counts,
+    column_title        = paste("Expression Levels of",
+                                as.character(nrow(normalised_counts)),
+                                "Genes in GSE152641"),
+    name                = "Expr lvl",
+    cluster_rows        = TRUE,
+    cluster_columns     = FALSE,
+    show_row_dend       = TRUE,
+    show_column_dend    = TRUE,
+    col                 = heatmap_cols(normalised_counts),
+    show_column_names   = FALSE,
+    show_row_names      = FALSE,
+    show_heatmap_legend = TRUE
+)
+```
+
+We can see nothing. The reason being is that
+most of the expression values were masked by
+some expression values that are extremely high.
+To explain this in a more intuitive way:
+
+```{r, code_folding = TRUE}
+gene_dist <- apply(normalised_counts, MARGIN = 1, FUN = hist, plot = FALSE)
+gene_col  <- rainbow(n = length(gene_dist), alpha = 0.5)
+
+xlim <- 0; ylim <- 0;
+for (i in seq_along(gene_dist)) {
+    xlim <- range(c(xlim, gene_dist[[i]]$breaks))
+    ylim <- range(c(ylim, gene_dist[[i]]$counts))
+}
+
+## Find the row that has the max count
+gene_max_count <- which(normalised_counts == max(normalised_counts),
+                        arr.ind = TRUE)[1]
+
+plot(x        = xlim,
+     y        = ylim,
+     type     = "n",
+     main     = paste("Distributions for Expression Values of",
+                      nrow(normalised_counts), "Genes",
+                      "in", ncol(normalised_counts), "Samples"),
+     cex.main = 0.95,
+     xlab     = "TMM normalised counts",
+     ylab     = "Frequency"
+)
+for (i in seq_along(gene_dist)){
+    plot(gene_dist[[i]],
+         col = gene_col[i],
+         lty = "blank",
+         add = TRUE
+    )
+}
+legend("topright",
+       legend = rownames(normalised_counts)[gene_max_count],
+       fill   = gene_col[gene_max_count],
+       border = gene_col[gene_max_count],
+       cex    = 0.75
+)
+```
+
+As shown by the distributions,
+while only a few genes have high expression values,
+the majority of the genes have counts far below 20000.
+A few extremely high expression values
+can mask most of the other expression values in the heatmap.
+This is why the heatmap above showing
+virtually all the genes have the same level of expression in the 86 samples.
+To show the difference in expression levels between genes,
+we need to transform the expression values for each gene to comparable scales.
+
+### Standardising expression values
+
+A common practice before ploting RNA-seq data in a heatmap is to
+standardise the normalised counts of a gene across all samples to z-scores,
+that is, calculate z-scores by genes(rows):
+
+```{r}
+z_mat <- t(                    ## transpose matrix => row = samples, col = genes
+    scale(                    ## convert values of each column(gene) to Z scores
+        t(normalised_counts)
+        )      ## transpose the transposed matrix => row =  genes, col = samples
+    )          
+```
+
+The heatmap after z-scoring:
+
+```{r}
+ComplexHeatmap::Heatmap(
+    matrix              = z_mat,
+    column_title        = paste("Expression Levels of",
+                                as.character(nrow(normalised_counts)),
+                                "Genes 86 Samples of GSE152641"),
+    name                = "Expr lvl",
+    cluster_rows        = TRUE,
+    cluster_columns     = FALSE,
+    show_row_dend       = TRUE,
+    show_column_dend    = TRUE,
+    col                 = heatmap_cols(z_mat),
+    show_column_names   = FALSE, ## Too many samples. Will be messy if show them
+    show_row_names      = FALSE,
+    show_heatmap_legend = TRUE
+)
+```
+
+The expression levels of the 14418 genes now become visible.
+However, we cannot tell which part of the heatmap corresponds to which sample,
+or more importantly which group of the 86 samples.
+Without this piece of information,
+it will be impossible to show the difference in gene expression level between
+the healthy control and the COVID-19 patients in the heatmap.
+
+
+### Heatmap annotation
+
+The <code>HeatmapAnnotation</code> object in <code>ComplexHeatmap</code> is
+dedicated to this purpose.
+The constructor method for <code>HeatmapAnnotation</code> requires
+two input arguments:
+a data frame with a column of group names for each sample and
+a list with a named vector of colour codes:
+
+```{r}
+## Create a vector named with sample groups
+groups         <- levels(factor(samples$group))    ## get group names of samples
+ha_cols        <- c("orange", "blue")
+names(ha_cols) <- groups
+```
+
+To present the annotation for the sample groups in a more organised way,
+we can re-arrange the column order of the count matrix by groups:
+
+```{r}
+group_order <- c(which(samples$group == groups[1]),
+                 which(samples$group == groups[2]))    ## column index by groups
+```
+
+And to create a heatmap annotation object using the constructor method:
+
+```{r}
+ha <- ComplexHeatmap::HeatmapAnnotation(
+        df  = data.frame(Sample = samples$group[group_order]),
+        col = list(Sample = ha_cols)
+    )
+```
+
+The heatmap with an annotation for the sample groups:
+
+```{r}
+ComplexHeatmap::Heatmap(
+    matrix              = z_mat[ , group_order],
+    column_title        = paste("Expression Levels of",
+                                as.character(nrow(normalised_counts)),
+                                "Genes 86 Samples of GSE152641"),
+    name                = "Expr lvl",
+    cluster_rows        = TRUE,
+    cluster_columns     = FALSE,
+    show_row_dend       = TRUE,
+    show_column_dend    = TRUE,
+    col                 = heatmap_cols(z_mat),
+    show_column_names   = FALSE, ## Too many samples. Will be messy if show them
+    show_row_names      = FALSE,
+    show_heatmap_legend = TRUE,
+    top_annotation      = ha      ## put annotation for sample groups at the top
+)
+```
+
+Finally, putting everything above together,
+we can write a function to avoid duplicate code:
+
+```{r}
+plotHeatMap <- function(deg = integer(0),
+                        m,
+                        samples,
+                        title = "",
+                        group_cols = c("orange", "blue")) {
+    # Purpose:
+    #     Standardise values in the input count matrix to Z-scores, and
+    #     generate a heatmap plot for gene expression with samples ordered
+    #     by their groups and annotated.
+    # Parameters:
+    #     deg    : a vector of differentially expressed genes 
+    #     m      : RNA-seq count matrix
+    #     samples:
+    #              A dataframe specifying to which group a sample belongs.
+    #              Note that it only supports samples divided into 2 groups:
+    #              control and experimental
+    #     title:   Title for the heatmap
+    #     group_cols:
+    #              Colours to annotate the heatmap by groups.
+    #              Use preset colours if not supplied.
+    # Value:
+    #     gene_heatmap: A heatmap object
+    
+    require(ComplexHeatmap)
+    
+    # Row normalisation/standardisation to Z-scores
+    if (length(deg) == 0) {
+        m <- t(
+            scale(
+                t(m)            # transpose matrix => row = samples, col = genes
+            )                  # convert values of each column(gene) to Z scores
+        )       # transpose the transposed matrix => row =  genes, col = samples
+    } else {
+        m <- t(scale(t(m[which(rownames(m) %in% deg), ])))
+    }
+    
+    # Get group names of samples
+    groups <- unique(samples$group)
+    
+    # Sample order divided by group
+    group_order <- c(which(samples$group == groups[2]),
+                     which(samples$group == groups[1]))
+    
+    # Annotate heatmap by groups
+    ha_cols <- group_cols
+    names(ha_cols) <- groups
+    ha <- ComplexHeatmap::HeatmapAnnotation(
+        df  = data.frame(Group = samples$group[group_order]),
+        col = list(Group = ha_cols)
+    )
+    # Generate a heatmap
+    gene_heatmap <- ComplexHeatmap::Heatmap(
+        matrix              = m[ , group_order],
+        column_title        = title,
+        name                = "Expr lvl",
+        cluster_rows        = TRUE,
+        cluster_columns     = FALSE,
+        show_row_dend       = TRUE,
+        show_column_dend    = TRUE,
+        col                 = heatmap_colours(m),
+        show_column_names   = FALSE,
+        show_row_names      = FALSE,
+        show_heatmap_legend = TRUE,
+        top_annotation      = ha
+    )
+    
+    return(gene_heatmap)
+}
+```
+
+
+
+
+## DE Analysis by Quasi-Likelihood Methods (QLM)
+
+### Model Design
+
+We hypothesise that COVID-19 status of samples was the only factor contributing to differential gene expression. Therefore, we model on *group* (status COVID-19 and healthy control) such that fitting this design matrix will tell us how the COVID-19 status of a sample explains his/her expression levels of genes.
+
+```{r}
+model_design <- model.matrix(~group, data = samples)
+```
+
+
+
+### Volcano Plot
+
+```{r}
+plotVolcano <- function(df, title, gene_of_interest = integer(0)) {
+    # Purpose:
+    #     Plot a vocanol plot conveniently with highlighted genes of interest.
+    # Parameters:
+    #     df: A dataframe dedicated to this dataset,
+    #         must include the following ordered columns, regardless of names:
+    #         column 1: HGNC gene symbol
+    #         column 2: Fold change on log2 scale
+    #         column 3: negated P-value on log10 scale
+    #     title: title of the plot
+    #     gene_of_interst:
+    #         A vector of genes to highlight, optional
+    # Value:
+    #     result: A volcano plot with genes of interest highlighted.
+    
+    cols <- c("insig"     = "grey",
+              "sig"       = "#2cbe88",
+              "highlight" = "#d03b41")
+    
+    df$colour <- cols["insig"]
+    
+    sig <- which(df[ , 3] > -log10(0.05))
+    df[sig, "colour"] <- cols["sig"]
+    
+    highlight <- integer(0)
+    if (length(gene_of_interest) > 0) {
+        highlight <- which(df[ , 1] %in% gene_of_interest)
+    }
+    x <- df[ ,2]
+    y <- df[ ,3]
+    if (length(highlight) > 0) {
+        df[highlight, "colour"] <- cols["highlight"]
+    }
+    
+    plot(x    = df[-highlight, 2],
+         y    = df[-highlight, 3],
+         col  = df[-highlight, "colour"],
+         xlab = expression("Log"[2]*" fold change"),
+         ylab = expression("-Log"[10]*" P"),
+         main = title)
+    if (length(highlight) > 0) {
+        points(x      = df[highlight, 2],
+               y      = df[highlight, 3],
+               col    = df[highlight, "colour"],
+               pch    = 8,
+               cex    = 1.5,
+               lwd    = 2)
+        text(x        = df[highlight, 2],
+             y        = df[highlight, 3],
+             labels   = df[highlight, 1],
+             cex      = 0.75)
+        legend(x      = min(df[ , 2]),
+               y      = max(df[ , 3]),
+               legend = c("has evidence of DE",
+                          "insignificant",
+                          "gene of interest"),
+               col    = c(cols["sig"], cols["insig"], cols["highlight"]),
+               pch    = c(1, 1, 8),
+               cex    = 0.75)
+        
+    } else {
+        legend(x      = min(df[ , 2]),
+               y      = max(df[ , 3]),
+               legend = c("has evidence of DE", "insignificant"),
+               col    = c(cols["sig"], cols["insig"]),
+               cex    = 0.75)
+    }
+    abline(h    = -log10(0.05),
+           col  = "#0c82b7",
+           lty  = 2,
+           lwd  = 1.5)
+    text(x      = min(df[ , 2]) + 0.25,
+         y      = -log10(0.05)  + 0.5,
+         labels = "p = 0.05",
+         col    = "#0c82b7")
+    
+}
+```
+
+
+
+
+
