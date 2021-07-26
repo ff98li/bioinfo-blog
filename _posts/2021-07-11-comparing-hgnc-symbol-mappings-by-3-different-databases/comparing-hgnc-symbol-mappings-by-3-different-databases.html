@@ -125,7 +125,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   <!--/radix_placeholder_rmarkdown_metadata-->
   
   <script type="text/json" id="radix-resource-manifest">
-  {"type":"character","attributes":{},"value":["biblio.bib","biomart.png","comparing-hgnc-symbol-mappings-by-3-different-databases_files/anchor-4.2.2/anchor.min.js","comparing-hgnc-symbol-mappings-by-3-different-databases_files/bowser-1.9.3/bowser.min.js","comparing-hgnc-symbol-mappings-by-3-different-databases_files/distill-2.2.21/template.v2.js","comparing-hgnc-symbol-mappings-by-3-different-databases_files/header-attrs-2.9/header-attrs.js","comparing-hgnc-symbol-mappings-by-3-different-databases_files/jquery-1.11.3/jquery.min.js","comparing-hgnc-symbol-mappings-by-3-different-databases_files/kePrint-0.0.1/kePrint.js","comparing-hgnc-symbol-mappings-by-3-different-databases_files/lightable-0.0.1/lightable.css","comparing-hgnc-symbol-mappings-by-3-different-databases_files/popper-2.6.0/popper.min.js","comparing-hgnc-symbol-mappings-by-3-different-databases_files/tippy-6.2.7/tippy-bundle.umd.min.js","comparing-hgnc-symbol-mappings-by-3-different-databases_files/tippy-6.2.7/tippy-light-border.css","comparing-hgnc-symbol-mappings-by-3-different-databases_files/tippy-6.2.7/tippy.css","comparing-hgnc-symbol-mappings-by-3-different-databases_files/tippy-6.2.7/tippy.umd.min.js","comparing-hgnc-symbol-mappings-by-3-different-databases_files/webcomponents-2.0.0/webcomponents.js","data/Hs_Derby_Ensembl_91.bridge","data/normalised_counts.rds","derby.log"]}
+  {"type":"character","attributes":{},"value":["biblio.bib","biomart.png","comparing-hgnc-symbol-mappings-by-3-different-databases_files/anchor-4.2.2/anchor.min.js","comparing-hgnc-symbol-mappings-by-3-different-databases_files/bowser-1.9.3/bowser.min.js","comparing-hgnc-symbol-mappings-by-3-different-databases_files/distill-2.2.21/template.v2.js","comparing-hgnc-symbol-mappings-by-3-different-databases_files/header-attrs-2.9/header-attrs.js","comparing-hgnc-symbol-mappings-by-3-different-databases_files/jquery-1.11.3/jquery.min.js","comparing-hgnc-symbol-mappings-by-3-different-databases_files/kePrint-0.0.1/kePrint.js","comparing-hgnc-symbol-mappings-by-3-different-databases_files/lightable-0.0.1/lightable.css","comparing-hgnc-symbol-mappings-by-3-different-databases_files/popper-2.6.0/popper.min.js","comparing-hgnc-symbol-mappings-by-3-different-databases_files/tippy-6.2.7/tippy-bundle.umd.min.js","comparing-hgnc-symbol-mappings-by-3-different-databases_files/tippy-6.2.7/tippy-light-border.css","comparing-hgnc-symbol-mappings-by-3-different-databases_files/tippy-6.2.7/tippy.css","comparing-hgnc-symbol-mappings-by-3-different-databases_files/tippy-6.2.7/tippy.umd.min.js","comparing-hgnc-symbol-mappings-by-3-different-databases_files/webcomponents-2.0.0/webcomponents.js","data/entrez2Hgnc.rds","data/Hs_Derby_Ensembl_91.bridge","data/normalised_counts.rds","derby.log"]}
   </script>
   <!--radix_placeholder_navigation_in_header-->
   <!--/radix_placeholder_navigation_in_header-->
@@ -49855,7 +49855,7 @@ TRUE
 </code></pre>
 </div>
 </div>
-<p>We will use it as a dictionary object in Python for mapping:<br />
+<p>We will use it like a dictionary object in Python for mapping:<br />
 </p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
@@ -49879,14 +49879,17 @@ TRUE
 </code></pre>
 </div>
 </div>
-<p>We have mapped every Entrez gene IDs in the count matrix to their HGNC symbols. This concludes the initial processing of the bulk RNA-seq count data of GSE152641:</p>
+<p>We have mapped every Entrez gene IDs in the count matrix to their HGNC symbols.</p>
+<p>Save the normalised count matrix with the gene names mapped and the mapping for later analyses:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>saveRDS</a></span><span class='op'>(</span>object <span class='op'>=</span> <span class='va'>normalised_counts</span>,
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>saveRDS</a></span><span class='op'>(</span>object <span class='op'>=</span> <span class='va'>entrez2Hgnc</span>, file <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='st'>"."</span>, <span class='st'>"data"</span>, <span class='st'>"entrez2Hgnc.rds"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/readRDS.html'>saveRDS</a></span><span class='op'>(</span>object <span class='op'>=</span> <span class='va'>normalised_counts</span>,
         file   <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/file.path.html'>file.path</a></span><span class='op'>(</span><span class='st'>"."</span>, <span class='st'>"data"</span>, <span class='st'>"normalised_counts.rds"</span><span class='op'>)</span><span class='op'>)</span>
 </code></pre>
 </div>
 </div>
+<p>This concludes the initial processing of the bulk RNA-seq count data of GSE152641:</p>
 <h2 id="conclusion">Conclusion</h2>
 <p>When mapping gene identifiers, it is always important to assess the quality of mappings produced by different databases. As shown above, in the case of mapping from Entrez gene IDs to HGNC symbols, OrgDb might be preferable to biomaRt. Here the quality of these mappings were only assessed based on the number of gene identifiers mapped. One thing we haven’t checked in the mappings is whether there are genes mismatched to wrong HGNC symbols. Yes, this could happen. For example, gene <code>100913187</code> in this dataset is being incorrectly mapped by biomaRt:</p>
 <div class="layout-chunk" data-layout="l-body">

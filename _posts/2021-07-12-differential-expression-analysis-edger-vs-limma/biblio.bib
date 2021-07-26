@@ -46,3 +46,86 @@ The pandemic 2019 novel coronavirus disease (COVID-19) shares certain clinical c
     url = {https://doi.org/10.1093/bioinformatics/btu393},
     eprint = {https://academic.oup.com/bioinformatics/article-pdf/30/19/2811/17143901/btu393.pdf},
 }
+
+@article{edgeR1,
+    author = {Robinson, Mark D. and McCarthy, Davis J. and Smyth, Gordon K.},
+    title = "{edgeR: a Bioconductor package for differential expression analysis of digital gene expression data}",
+    journal = {Bioinformatics},
+    volume = {26},
+    number = {1},
+    pages = {139-140},
+    year = {2009},
+    month = {11},
+    abstract = "{Summary: It is expected that emerging digital gene expression (DGE) technologies will overtake microarray technologies in the near future for many functional genomics applications. One of the fundamental data analysis tasks, especially for gene expression studies, involves determining whether there is evidence that counts for a transcript or exon are significantly different across experimental conditions. edgeR is a Bioconductor software package for examining differential expression of replicated count data. An overdispersed Poisson model is used to account for both biological and technical variability. Empirical Bayes methods are used to moderate the degree of overdispersion across transcripts, improving the reliability of inference. The methodology can be used even with the most minimal levels of replication, provided at least one phenotype or experimental condition is replicated. The software may have other applications beyond sequencing data, such as proteome peptide count data.Availability: The package is freely available under the LGPL licence from the Bioconductor web site (http://bioconductor.org).Contact:mrobinson@wehi.edu.au}",
+    issn = {1367-4803},
+    doi = {10.1093/bioinformatics/btp616},
+    url = {https://doi.org/10.1093/bioinformatics/btp616},
+    eprint = {https://academic.oup.com/bioinformatics/article-pdf/26/1/139/443156/btp616.pdf},
+}
+
+
+@article{edgeR2,
+    author = {McCarthy, Davis J. and Chen, Yunshun and Smyth, Gordon K.},
+    title = "{Differential expression analysis of multifactor RNA-Seq experiments with respect to biological variation}",
+    journal = {Nucleic Acids Research},
+    volume = {40},
+    number = {10},
+    pages = {4288-4297},
+    year = {2012},
+    month = {01},
+    abstract = "{A flexible statistical framework is developed for the analysis of read counts from RNA-Seq gene expression studies. It provides the ability to analyse complex experiments involving multiple treatment conditions and blocking variables while still taking full account of biological variation. Biological variation between RNA samples is estimated separately from the technical variation associated with sequencing technologies. Novel empirical Bayes methods allow each gene to have its own specific variability, even when there are relatively few biological replicates from which to estimate such variability. The pipeline is implemented in the edgeR package of the Bioconductor project. A case study analysis of carcinoma data demonstrates the ability of generalized linear model methods (GLMs) to detect differential expression in a paired design, and even to detect tumour-specific expression changes. The case study demonstrates the need to allow for gene-specific variability, rather than assuming a common dispersion across genes or a fixed relationship between abundance and variability. Genewise dispersions de-prioritize genes with inconsistent results and allow the main analysis to focus on changes that are consistent between biological replicates. Parallel computational approaches are developed to make non-linear model fitting faster and more reliable, making the application of GLMs to genomic data more convenient and practical. Simulations demonstrate the ability of adjusted profile likelihood estimators to return accurate estimators of biological variability in complex situations. When variation is gene-specific, empirical Bayes estimators provide an advantageous compromise between the extremes of assuming common dispersion or separate genewise dispersion. The methods developed here can also be applied to count data arising from DNA-Seq applications, including ChIP-Seq for epigenetic marks and DNA methylation analyses.}",
+    issn = {0305-1048},
+    doi = {10.1093/nar/gks042},
+    url = {https://doi.org/10.1093/nar/gks042},
+    eprint = {https://academic.oup.com/nar/article-pdf/40/10/4288/25335174/gks042.pdf},
+}
+
+
+@article{limma,
+    author = {Ritchie, Matthew E. and Phipson, Belinda and Wu, Di and Hu, Yifang and Law, Charity W. and Shi, Wei and Smyth, Gordon K.},
+    title = "{limma powers differential expression analyses for RNA-sequencing and microarray studies}",
+    journal = {Nucleic Acids Research},
+    volume = {43},
+    number = {7},
+    pages = {e47-e47},
+    year = {2015},
+    month = {01},
+    abstract = "{limma is an R/Bioconductor software package that provides an integrated solution for analysing data from gene expression experiments. It contains rich features for handling complex experimental designs and for information borrowing to overcome the problem of small sample sizes. Over the past decade, limma has been a popular choice for gene discovery through differential expression analyses of microarray and high-throughput PCR data. The package contains particularly strong facilities for reading, normalizing and exploring such data. Recently, the capabilities of limma have been significantly expanded in two important directions. First, the package can now perform both differential expression and differential splicing analyses of RNA sequencing (RNA-seq) data. All the downstream analysis tools previously restricted to microarray data are now available for RNA-seq as well. These capabilities allow users to analyse both RNA-seq and microarray data with very similar pipelines. Second, the package is now able to go past the traditional gene-wise expression analyses in a variety of ways, analysing expression profiles in terms of co-regulated sets of genes or in terms of higher-order expression signatures. This provides enhanced possibilities for biological interpretation of gene expression differences. This article reviews the philosophy and design of the limma package, summarizing both new and historical features, with an emphasis on recent enhancements and features that have not been previously described.}",
+    issn = {0305-1048},
+    doi = {10.1093/nar/gkv007},
+    url = {https://doi.org/10.1093/nar/gkv007},
+    eprint = {https://academic.oup.com/nar/article-pdf/43/7/e47/7207289/gkv007.pdf},
+}
+
+
+@article{DGEplot,
+    author = {McDermaid, Adam and Monier, Brandon and Zhao, Jing and Liu, Bingqiang and Ma, Qin},
+    title = "{Interpretation of differential gene expression results of RNA-seq data: review and integration}",
+    journal = {Briefings in Bioinformatics},
+    volume = {20},
+    number = {6},
+    pages = {2044-2054},
+    year = {2018},
+    month = {08},
+    abstract = "{Differential gene expression (DGE) analysis is one of the most common applications of RNA-sequencing (RNA-seq) data. This process allows for the elucidation of differentially expressed genes across two or more conditions and is widely used in many applications of RNA-seq data analysis. Interpretation of the DGE results can be nonintuitive and time consuming due to the variety of formats based on the tool of choice and the numerous pieces of information provided in these results files. Here we reviewed DGE results analysis from a functional point of view for various visualizations. We also provide an R/Bioconductor package, Visualization of Differential Gene Expression Results using R, which generates information-rich visualizations for the interpretation of DGE results from three widely used tools, Cuffdiff, DESeq2 and edgeR. The implemented functions are also tested on five real-world data sets, consisting of one human, one Malus domestica and three Vitis riparia data sets.}",
+    issn = {1477-4054},
+    doi = {10.1093/bib/bby067},
+    url = {https://doi.org/10.1093/bib/bby067},
+    eprint = {https://academic.oup.com/bib/article-pdf/20/6/2044/31789270/bby067\_supp.pdf},
+}
+
+@article{limmaDEA,
+author = {Belinda Phipson and Stanley Lee and Ian J. Majewski and Warren S. Alexander and Gordon K. Smyth},
+title = {{Robust hyperparameter estimation protects against hypervariable genes and improves power to detect differential expression}},
+volume = {10},
+journal = {The Annals of Applied Statistics},
+number = {2},
+publisher = {Institute of Mathematical Statistics},
+pages = {946 -- 963},
+keywords = {Empirical Bayes, gene expression, microarrays, Outliers, robustness},
+year = {2016},
+doi = {10.1214/16-AOAS920},
+URL = {https://doi.org/10.1214/16-AOAS920}
+}
+
+

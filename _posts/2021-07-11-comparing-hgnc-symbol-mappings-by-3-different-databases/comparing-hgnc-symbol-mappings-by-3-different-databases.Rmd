@@ -805,7 +805,7 @@ entrez2Hgnc <- setNames(as.character(entrez2Hgnc_OrgDb$SYMBOL),
                         nm = entrez2Hgnc_OrgDb$ENTREZID)
 ```
 
-We will use it as a dictionary object in Python for mapping:\
+We will use it like a dictionary object in Python for mapping:\
 
 ```{r}
 ## Select genes that have their Entrez IDs mapped to HGNC symbols
@@ -827,13 +827,15 @@ normalised_counts <- normalised_counts[-select, ]
 ```
 
 We have mapped every Entrez gene IDs in the count matrix to their HGNC symbols.
-This concludes the initial processing of the bulk RNA-seq count data of GSE152641:
+
+Save the normalised count matrix with the gene names mapped for later analyses:
 
 ```{r}
 saveRDS(object = normalised_counts,
         file   = file.path(".", "data", "normalised_counts.rds"))
 ```
 
+This concludes the initial processing of the bulk RNA-seq count data of GSE152641:
 
 ## Conclusion
 

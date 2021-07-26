@@ -484,10 +484,9 @@ Extract the normalised count matrix:
 normalised_counts <- edgeR::cpm(d)
 ```
 
-Save the normalised count matrix and the DGEList as R objects for later analyses:
+Save the normalised count matrix as an R object for later analyses:
 
 ```{r}
-saveRDS(object = d, file = file.path(".", "data", "DGEList.rds"))
 saveRDS(object = normalised_counts,
         file   = file.path(".", "data", "normalised_counts.rds"))
 ```
