@@ -5,7 +5,7 @@ description: |
     and visualise differentially expressed genes in R
 author:
     - name: Feifei Li
-date: 2021-07-25
+date: 2021-07-26
 output:
   distill::distill_article:
         self_contained: FALSE
@@ -54,7 +54,7 @@ if (!requireNamespace("ComplexHeatmap", quietly = TRUE))
 We write a function to create a color palette using <code>circlize</code>:
 
 ```{r}
-heatmap_cols <- function(mat, neg = "green", zero = "black", pos = "red") {
+heatmap_cols <- function(mat, neg = "blue", zero = "white", pos = "red") {
     # Purpose:
     #     Helper function to create a transition colour gradient for a heatmap
     # Parameters:
@@ -208,7 +208,7 @@ a list with a named vector of colour codes:
 ```{r}
 ## Create a vector named with sample groups
 groups         <- levels(factor(samples$group))    ## get group names of samples
-ha_cols        <- c("orange", "blue")
+ha_cols        <- c("#B00020", "#008B00")
 names(ha_cols) <- groups
 ```
 
@@ -258,7 +258,7 @@ plotHeatMap <- function(deg   = integer(0),
                         m,
                         samples,
                         title = "",
-                        cols  = c("orange", "blue")) {
+                        cols  = c("#B00020", "#008B00")) {
     # Purpose:
     #     Ad-hoc function to standardise values in the input matrix to Z-scores,
     #     and generate a heatmap plot for gene expression with samples ordered
@@ -616,7 +616,7 @@ knitr::kable(data.frame(
 ))
 ```
 
-The result is quite similar to that of the QLM F-test, with slightly fewer genes that passed the threshold.
+The result is similar to that of the QLM F-test, with more genes that passed the corrected p-value threshold.
 
 ### Volcano Plot for Limma top-hit Genes
 
@@ -730,11 +730,9 @@ legend(
 )
 ```
 
-The p-values calculated by QLF and Limma methods exhibit a strong positive linear correlation, suggesting the similarity in the results of these two differential expression analyses.
-Both of these two methods can capture a common subset of top hits;
-this is consistent with the nearly identical clustering pattern in the two heatmaps.
-
-A question one might ask is which method is better to use.
+The p-values calculated by QLF and Limma methods appear to be patternless.
+These two methods only capture a small common subset of differentially expressed genes.
+A question one might ask is, which method is better to use.
 Unfortunately this is also a question that I have not been able to answer.
 For RNA-seq differential expression analysis,
 I prefer edgeR to limma as limma is mostly used for microarray analyses,

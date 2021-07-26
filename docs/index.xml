@@ -7,7 +7,20 @@
     <description>Bioinformatics, R, and more
 </description>
     <generator>Distill</generator>
-    <lastBuildDate>Sun, 11 Jul 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 26 Jul 2021 00:00:00 +0000</lastBuildDate>
+    <item>
+      <title>Differential Expression Analysis: edgeR vs limma</title>
+      <dc:creator>Feifei Li</dc:creator>
+      <link>https://www.ffli.dev/posts/2021-07-26-differential-expression-analysis-edger-vs-limma</link>
+      <description>Perform differential expression analysis
+and visualise differentially expressed genes in R</description>
+      <category>R</category>
+      <category>bioconductor</category>
+      <category>bioinformatics</category>
+      <guid>https://www.ffli.dev/posts/2021-07-26-differential-expression-analysis-edger-vs-limma</guid>
+      <pubDate>Mon, 26 Jul 2021 00:00:00 +0000</pubDate>
+      <media:content url="https://www.ffli.dev/posts/2021-07-26-differential-expression-analysis-edger-vs-limma/hm.png" medium="image" type="image/png" width="700" height="432"/>
+    </item>
     <item>
       <title>Comparing HGNC Symbol Mappings by 3 Different Databases</title>
       <dc:creator>Feifei Li</dc:creator>
