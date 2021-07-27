@@ -6,6 +6,7 @@ description: |
 author:
     - name: Feifei Li
 date: 2021-07-26
+bibliography: biblio.bib
 output:
   distill::distill_article:
         self_contained: FALSE
