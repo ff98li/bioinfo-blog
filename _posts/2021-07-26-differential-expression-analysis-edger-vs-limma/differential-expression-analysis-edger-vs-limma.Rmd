@@ -2,7 +2,7 @@
 title: "Differential Expression Analysis: edgeR vs limma"
 description: |
     Perform differential expression analysis
-    and visualise differentially expressed genes in R
+    and visualise differentially expressed genes in R.
 author:
     - name: Feifei Li
 date: 2021-07-26
@@ -53,7 +53,7 @@ if (!requireNamespace("ComplexHeatmap", quietly = TRUE))
 
 We write a function to create a color palette using <code>circlize</code>:
 
-```{r}
+```{r, code_folding = TRUE}
 heatmap_cols <- function(mat, neg = "blue", zero = "white", pos = "red") {
     # Purpose:
     #     Helper function to create a transition colour gradient for a heatmap
@@ -82,7 +82,7 @@ heatmap_cols <- function(mat, neg = "blue", zero = "white", pos = "red") {
 One might ask, how could an expression value be negative? Before answering that,
 if we directly plot out the gene counts in a heatmap:
 
-```{r}
+```{r code_folding = TRUE}
 ComplexHeatmap::Heatmap(
     matrix              = normalised_counts,
     column_title        = paste("Expression Levels of",
@@ -170,7 +170,7 @@ z_mat <- t(                    ## transpose matrix => row = samples, col = genes
 
 The heatmap after z-scoring:
 
-```{r}
+```{r, code_folding = TRUE}
 ComplexHeatmap::Heatmap(
     matrix              = z_mat,
     column_title        = paste("Expression Levels of",
@@ -231,7 +231,7 @@ ha <- ComplexHeatmap::HeatmapAnnotation(
 
 The heatmap with an annotation for the sample groups:
 
-```{r}
+```{r, code_folding = TRUE}
 ComplexHeatmap::Heatmap(
     matrix              = z_mat[ , group_order],
     column_title        = paste("Expression Levels of",
@@ -638,7 +638,7 @@ The volcano plot is nearly identical to the one for the edgeR result.
 
 ### Heatmap for Limma top-hit Genes
 
-```{r, warning=FALSE, message=FALSE, echo=FALSE}
+```{r, code_folding = TRUE}
 tophits_limma <- rownames(limma_output_hits[which(
     limma_output_hits$adj.P.Val < 0.05
     ), ])

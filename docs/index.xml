@@ -13,7 +13,7 @@
       <dc:creator>Feifei Li</dc:creator>
       <link>https://www.ffli.dev/posts/2021-07-26-differential-expression-analysis-edger-vs-limma</link>
       <description>Perform differential expression analysis
-and visualise differentially expressed genes in R</description>
+and visualise differentially expressed genes in R.</description>
       <category>R</category>
       <category>bioconductor</category>
       <category>bioinformatics</category>
