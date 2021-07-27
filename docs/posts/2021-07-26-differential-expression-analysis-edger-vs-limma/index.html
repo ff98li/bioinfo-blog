@@ -2869,7 +2869,7 @@ Show code
     matrix              <span class='op'>=</span> <span class='va'>z_mat</span>,
     column_title        <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste</a></span><span class='op'>(</span><span class='st'>"Expression Levels of"</span>,
                                 <span class='fu'><a href='https://rdrr.io/r/base/character.html'>as.character</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>nrow</a></span><span class='op'>(</span><span class='va'>normalised_counts</span><span class='op'>)</span><span class='op'>)</span>,
-                                <span class='st'>"Genes 86 Samples of GSE152641"</span><span class='op'>)</span>,
+                                <span class='st'>"Genes in 86 Samples of GSE152641"</span><span class='op'>)</span>,
     name                <span class='op'>=</span> <span class='st'>"Expr lvl"</span>,
     cluster_rows        <span class='op'>=</span> <span class='cn'>TRUE</span>,
     cluster_columns     <span class='op'>=</span> <span class='cn'>FALSE</span>,
@@ -2926,7 +2926,7 @@ Show code
     matrix              <span class='op'>=</span> <span class='va'>z_mat</span><span class='op'>[</span> , <span class='va'>group_order</span><span class='op'>]</span>,
     column_title        <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste</a></span><span class='op'>(</span><span class='st'>"Expression Levels of"</span>,
                                 <span class='fu'><a href='https://rdrr.io/r/base/character.html'>as.character</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>nrow</a></span><span class='op'>(</span><span class='va'>normalised_counts</span><span class='op'>)</span><span class='op'>)</span>,
-                                <span class='st'>"Genes 86 Samples of GSE152641"</span><span class='op'>)</span>,
+                                <span class='st'>"Genes in 86 Samples of GSE152641"</span><span class='op'>)</span>,
     name                <span class='op'>=</span> <span class='st'>"Expr lvl"</span>,
     cluster_rows        <span class='op'>=</span> <span class='cn'>TRUE</span>,
     cluster_columns     <span class='op'>=</span> <span class='cn'>FALSE</span>,
@@ -5143,7 +5143,7 @@ Show code
 </details>
 <p><img src="differential-expression-analysis-edger-vs-limma_files/figure-html5/unnamed-chunk-21-1.png" width="624" /></p>
 </div>
-<p>The heatmap plotted from the top-hit genes (<span class="math inline">\(FDR &lt; 0.05\)</span>) from the differential expression analysis exhibits clusters of up-regulated and down-regulated expressions between the two group. This was not observed in the heatmap plotted using all the genes because here we have removed genes that show no significant evidence for differential expression for COVID-19 status (<span class="math inline">\(FDR \geq 0.05\)</span>), which introduced noises in the first heatmap.</p>
+<p>The heatmap plotted from the top-hit genes (<span class="math inline">\(\mathrm{FDR}&lt; 0.05\)</span>) from the differential expression analysis exhibits clusters of up-regulated and down-regulated expressions between the two group. This was not observed in the heatmap plotted using all the genes because here we have removed genes that show no significant evidence for differential expression for COVID-19 status (<span class="math inline">\(\mathrm{FDR}\geq 0.05\)</span>), which introduced noises in the first heatmap.</p>
 <h2 id="differential-expression-analysis-by-linear-models-of-mircroarray-limma">Differential Expression Analysis by Linear Models of MircroArray (Limma)</h2>
 <p><a href="10.18129/B9.bioc.limma">Limma</a><span class="citation" data-cites="limma">(<a href="#ref-limma" role="doc-biblioref">Ritchie et al. 2015</a>)</span> has two methods for differential expression analysis: the precision weights approach (voom) and the empirical Bayes prior trend approach (limma-trend). The later limma-trend appraoch is simpler and more robust than voom, provided that the sequencing depth across the RNA samples is reasonably consistent. According to <a href="http://www.bioconductor.org/packages/release/bioc/vignettes/limma/inst/doc/usersguide.pdf">the limma user guide</a>, the sequencing depth is considered to be reasonably consistent if the ratio of the largest library size to the smallest is not more than about 3-fold. The limma-trend method is applied here.<span class="citation" data-cites="limmaDEA">(<a href="#ref-limmaDEA" role="doc-biblioref">Phipson et al. 2016</a>)</span></p>
 <h3 id="multiple-hypothesis-testing">Multiple Hypothesis Testing</h3>

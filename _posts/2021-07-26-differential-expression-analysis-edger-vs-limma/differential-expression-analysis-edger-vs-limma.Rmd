@@ -19,6 +19,9 @@ categories:
 preview: hm.png
 ---
 
+\newcommand{\sgn}{\operatorname{sgn}}
+\newcommand{\fdr}{\mathrm{FDR}}
+\newcommand{\fc}{\mathrm{FC}}
 
 ```{r setup, include=FALSE}
 library(kableExtra)
@@ -176,7 +179,7 @@ ComplexHeatmap::Heatmap(
     matrix              = z_mat,
     column_title        = paste("Expression Levels of",
                                 as.character(nrow(normalised_counts)),
-                                "Genes 86 Samples of GSE152641"),
+                                "Genes in 86 Samples of GSE152641"),
     name                = "Expr lvl",
     cluster_rows        = TRUE,
     cluster_columns     = FALSE,
@@ -237,7 +240,7 @@ ComplexHeatmap::Heatmap(
     matrix              = z_mat[ , group_order],
     column_title        = paste("Expression Levels of",
                                 as.character(nrow(normalised_counts)),
-                                "Genes 86 Samples of GSE152641"),
+                                "Genes in 86 Samples of GSE152641"),
     name                = "Expr lvl",
     cluster_rows        = TRUE,
     cluster_columns     = FALSE,
@@ -537,7 +540,7 @@ plotHeatMap(deg     = tophits_qlf,
 ```
 
 
-The heatmap plotted from the top-hit genes ($FDR < 0.05$) from the differential expression analysis exhibits clusters of up-regulated and down-regulated expressions between the two group. This was not observed in the heatmap plotted using all the genes because here we have removed genes that show no significant evidence for differential expression for COVID-19 status ($FDR \geq 0.05$), which introduced noises in the first heatmap.
+The heatmap plotted from the top-hit genes ($\fdr < 0.05$) from the differential expression analysis exhibits clusters of up-regulated and down-regulated expressions between the two group. This was not observed in the heatmap plotted using all the genes because here we have removed genes that show no significant evidence for differential expression for COVID-19 status ($\fdr \geq 0.05$), which introduced noises in the first heatmap.
 
 
 ## Differential Expression Analysis by Linear Models of MircroArray (Limma)
@@ -797,9 +800,6 @@ write.table(x         = gene_rank,
             quote     = FALSE)
 ```
 
-\newcommand{\sgn}{\operatorname{sgn}}
-\newcommand{\fdr}{\mathrm{FDR}}
-\newcommand{\fc}{\mathrm{FC}}
 
 Note that we define the rank to be $-\log_{10}{\fdr} \ \cdot\ \sgn(\log{\fc})$. With the $-\log_{10}{\fdr}$, the samller the (corrected) p-value for a gene is, the higher the rank of that gene, regardless of whether it is up- or downregulated. The other term $\sgn(\log{\fc})$ take into account the factor of regulation of gene expression:
 if it is up-regulated, then it will be ranked from the top;
