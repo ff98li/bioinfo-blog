@@ -12,7 +12,7 @@ navbar:
         - icon: fab fa-github-alt
           href: https://github.com/ff98li
         - icon: fas fa-graduation-cap
-          href: content/docs/cv.pdf
+          href: cv.pdf
         - icon: fas fa-lightbulb
 base_url: https://www.ffli.dev/
 repository_url: https://github.com/ff98li/ffli.dev
