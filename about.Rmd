@@ -22,3 +22,5 @@ _To know before hand all the agony they still must bear._\
 This blog is dedicated to documenting my learning journey of bioinformatics,
 and share my experience in hopes of helping those who are facing the same problems
 as I have encountered (and solved).\
+
+坑之宝贵，踩后自知。\
